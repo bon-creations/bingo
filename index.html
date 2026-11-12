@@ -166,6 +166,11 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
 #game.land .navbtn{display:block;flex:0 0 auto;width:38px;height:96px;border:0;border-radius:12px;background:var(--pink);color:#fff;font-size:1.1rem;font-weight:bold;box-shadow:0 3px 0 var(--pink-d)}
 #game.land .navbtn:disabled{opacity:.3}
 #game.land .cards{grid-template-columns:repeat(2,minmax(0,176px));justify-content:center;gap:8px}
+#game.land .cards.many{grid-template-columns:repeat(4,minmax(0,110px));gap:4px}
+.cards.many{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px}
+.cards.many .card-wrap h3{font-size:.62rem;margin:0}
+.cards.many .hdr{font-size:.5rem}
+.cards.many .cell{font-size:.5rem;border-radius:3px}
 #game.land .card-wrap h3{margin:0 0 2px;font-size:.8rem}
 #game.land .cell{font-size:clamp(.65rem,2.3vw,.95rem)}
 #game.land .hud{flex-wrap:wrap;gap:2px 6px;font-size:.72rem}
@@ -195,6 +200,18 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
 .paper-grid .pc.on{background:var(--yellow);color:var(--ink);font-weight:bold}
 .paper-grid .pc.last{background:var(--pink);color:#fff;outline:2px solid var(--ink)}
 .side .sval small{display:block;font-size:.62rem;font-weight:bold;color:#6d5c78;margin-top:2px}
+.panel h2{display:inline-block;background:linear-gradient(90deg,var(--pink),#ffb36b);color:#fff;border-radius:999px;padding:3px 14px;font-size:.95rem;margin:12px 0 6px;box-shadow:0 2px 0 var(--pink-d)}
+.panel>h2:first-child{margin-top:0}
+.bar{height:8px;background:#efe3d0;border-radius:6px;overflow:hidden;margin-top:4px;min-width:140px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--mint),var(--blue));border-radius:6px}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:6px}
+.tile{background:#fff;border:2px solid #eadbc6;border-radius:16px;padding:8px;text-align:center}.tile b{display:block;font-size:1.5rem;color:var(--pink-d)}.tile small{color:#7a6c85}
+.row.locked{opacity:.55}
+.rankbox{text-align:center;background:linear-gradient(135deg,#fff1b8,#ffd6e0);border-radius:18px;padding:12px;margin-bottom:10px;border:2px solid #fff;box-shadow:0 3px 0 rgba(59,45,74,.15)}.rankbox b{font-size:1.4rem}
+body.anim-off *,body.anim-off *::before,body.anim-off *::after{animation:none !important;transition:none !important}
+body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-duration:.35s !important;transition-duration:.12s !important}
+.bub{margin:4px auto 0;background:#fff;border:2px solid var(--ink);border-radius:12px;padding:2px 8px;font-size:.72rem;font-weight:bold;max-width:150px;line-height:1.3}
+.cell.bz{background-size:72%;background-repeat:no-repeat;background-position:center 14%;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 5px #fff}
+.cell.pcell{align-items:flex-end;font-size:clamp(.5rem,2.4vw,.68rem);font-weight:900;padding-bottom:1px}
 </style>
 </head>
 <body>
@@ -227,10 +244,11 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
       <button class="btn sub" data-go="free">フリービンゴ</button>
       <button class="btn sub" data-go="tournament">トーナメント</button>
       <button class="btn sub" data-go="challenge">チャレンジ</button>
-      <button class="btn sub" data-go="modes">ほかのモード</button>
+      <button class="btn sub" data-go="modes">ほかのモード（リーグ戦）</button>
+      <button class="btn sub" data-go="roulette">デイリールーレット</button>
       <button class="btn" data-go="boss" id="btnBoss">ボスビンゴ</button>
       <button class="btn sub" data-go="char">キャラクター</button>
-      <button class="btn sub" data-go="shop">アイテムショップ</button>
+      <button class="btn sub" data-go="shop">ガチャ</button>
       <button class="btn sub" data-go="paper">紙ビンゴ（司会者）</button>
       <button class="btn sub" data-go="howto">用語と遊び方</button>
       <button class="btn sub" data-go="mission">ミッション</button>
@@ -251,7 +269,7 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
 
 <!-- ショップ -->
 <div id="shop" class="screen hidden">
-  <div class="row"><button class="btn small sub" id="shopBack">← タイトル</button><b>アイテムショップ</b><span id="shopCoins"></span></div>
+  <div class="row"><button class="btn small sub" id="shopBack">← タイトル</button><b>ガチャ</b><span id="shopCoins"></span></div>
   <div id="shopBody"></div>
 </div>
 
@@ -276,6 +294,7 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     </div>
     <div class="paper-btns">
       <button class="btn sub" id="paperBingo">ビンゴ！が出た</button>
+      <button class="opt" id="paperBigBtn">大画面</button>
       <button class="opt" id="paperReset">リセット</button>
     </div>
     <div id="paperRecent" class="paper-recent"></div>
@@ -292,7 +311,6 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
       <button class="opt spd" data-val="slow" aria-pressed="false">ゆっくり</button>
       <button class="opt spd" data-val="normal" aria-pressed="true">ふつう</button>
       <button class="opt spd" data-val="fast" aria-pressed="false">はやい</button>
-      <button class="opt hidden" id="dbgMeter">DBG:メーター満タン</button>
       <button class="opt" id="landBtn" aria-pressed="false">横持ち</button>
       <button class="opt" id="autoBtn" aria-pressed="false">オート</button>
       <button class="opt" id="pauseBtn" aria-pressed="false">一時停止</button>
@@ -308,6 +326,7 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
         <div class="sname" id="pName"></div>
         <div class="sskill" id="pSkill"></div>
         <div class="sval" id="pScore">0</div>
+        <div class="bub hidden" id="pBub"></div>
       </div>
       <div>
         <div class="ball" id="ballEl"><span class="letter" id="ballLetter">?</span><span class="num" id="ballNum">-</span></div>
@@ -317,14 +336,12 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
         <div class="sname" id="nName"></div>
         <div class="sskill" id="nSkill"></div>
         <div class="sval" id="nScore">0</div>
+        <div class="bub hidden" id="nBub"></div>
       </div>
     </div>
-    <div class="ticker" id="ticker"></div>
     <div class="history" id="history"></div>
   </div>
 
-  <div class="target hidden" id="targetBar"><span id="targetText"></span><button id="targetCancel">やめる</button></div>
-  <div class="items" id="items"></div>
   <div class="log" id="log"></div>
   </div>
 
@@ -366,16 +383,14 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
   </div>
 </div>
 
-<div id="picker" class="overlay hidden picker">
-  <div class="panel">
-    <h3>ナンバーチケット</h3>
-    <p>次に出したい数字（まだ出ていない数字）を入れてね</p>
-    <input id="pickNum" type="number" min="1" max="75">
-    <div class="btn-row"><button class="btn" id="pickOK">決定</button><button class="btn sub" id="pickNo">やめる</button></div>
-  </div>
+<div id="paperBig" class="hidden" style="position:fixed;inset:0;z-index:30;background:linear-gradient(135deg,#ffe3ee,#e3f4ff);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5vh;text-align:center;color:#3b2d4a">
+  <div id="bigCount" style="font-size:4vh;font-weight:bold">0 / 75</div>
+  <div style="width:min(54vh,76vw);height:min(54vh,76vw);border-radius:50%;background:#fff;border:1.2vh solid #ff7aa2;box-shadow:0 1vh 0 rgba(59,45,74,.25);display:flex;flex-direction:column;align-items:center;justify-content:center"><span id="bigLetter" style="font:900 10vh/1 system-ui;color:#c9557a">?</span><span id="bigNum" style="font:900 24vh/1 system-ui">-</span></div>
+  <div id="bigRecent" style="font-size:4.5vh;font-weight:bold;min-height:5vh"></div>
+  <div style="display:flex;gap:12px"><button class="btn" id="bigNext">次の数字！</button><button class="btn sub" id="bigClose">とじる</button></div>
 </div>
-
 <div id="banner" class="banner"></div>
+<button id="declBtn" class="btn hidden" style="position:fixed;left:50%;bottom:16%;transform:translateX(-50%);z-index:26;font-size:1.5rem;padding:14px 34px">BINGO!</button>
 <div id="toastline" class="toastline"></div>
 <div id="flash"></div>
 <canvas id="fx"></canvas>
@@ -400,12 +415,12 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
 
   const CHAR = {
     oko:  {name:'おこボン',  color:'#d63a2f', skill:'ゴールデンマークの効果が2倍', start:true},
-    nico: {name:'にこボン',  color:'#e0b019', skill:'アイテム使用時、3割で使用回数が戻る', start:true},
+    nico: {name:'にこボン',  color:'#e0b019', skill:'ビンゴが成立するたび ボーナス+10pt', start:true},
     hyoe: {name:'ひょえボン',color:'#3f7be0', skill:'ピンチのマスをヒントで光らせる', start:true},
-    mogu: {name:'もぐボン',  color:'#3fa764', skill:'アイテムを獲得しやすい'},
-    nemu: {name:'ねむボン',  color:'#8b5cc4', skill:'最初の8ターンは妨害を受けない'},
-    tere: {name:'てれボン',  color:'#ee7fa8', skill:'妨害の被害が半分になる'},
-    sakusha:{name:'さくしゃボン', color:'#6b7a3a', skill:'マスを開けるとパワーメーターが2倍近くたまる', start:true},
+    mogu: {name:'もぐボン',  color:'#3fa764', skill:'ビンゴが成立するたび コインがもらえる（+15）'},
+    nemu: {name:'ねむボン',  color:'#8b5cc4', skill:'最初の8ターンは あいてのマスが開きにくい'},
+    tere: {name:'てれボン',  color:'#ee7fa8', skill:'ラッキーナンバーのボーナスが2倍'},
+    sakusha:{name:'さくしゃボン', color:'#6b7a3a', skill:'ビンゴ宣言ボーナスが2倍', start:true},
     niji: {name:'にじボン',  color:'#9b7bd9', skill:'毎ターン、ランダムな特殊効果が出ることも'}
   };
   const DIFF = {
@@ -414,26 +429,6 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     hard:   {name:'つよい',   prob:1,    act:0.55, items:4},
     boss:   {name:'ボス',     prob:0.95, act:0.6,  items:5}
   };
-  const ITEMS = {
-    clover:{name:'ラッキークローバー',cat:'数字',desc:'次に抽選される数字を予告',price:60,target:null},
-    ticket:{name:'ナンバーチケット',cat:'数字',desc:'指定した数字を次回抽選候補に追加',price:80,target:'number'},
-    reroll:{name:'リロール',cat:'数字',desc:'次の抽選をやり直す',price:70,target:null},
-    double:{name:'ダブルナンバー',cat:'数字',desc:'次の数字抽選でポイント2倍',price:90,target:null},
-    free:  {name:'フリーマーク',cat:'カード',desc:'好きなマスを1つ開ける',price:120,target:'cell'},
-    shuffle:{name:'シャッフル',cat:'カード',desc:'カードの数字を一部入れ替える',price:100,target:null},
-    line:  {name:'ラインブースト',cat:'カード',desc:'指定した列のマスを1つ開ける',price:110,target:'col'},
-    golden:{name:'ゴールデンマーク',cat:'カード',desc:'指定マスの獲得ポイントを増やす',price:100,target:'cell'},
-    time:  {name:'タイムプラス',cat:'サポート',desc:'制限ターンを+5',price:50,target:null},
-    box:   {name:'アイテムボックス',cat:'サポート',desc:'ランダムなアイテムを獲得',price:60,target:null},
-    boost: {name:'ビンゴブースト',cat:'サポート',desc:'3ターンのあいだ ビンゴ報酬1.5倍',price:90,target:null},
-    charm: {name:'お守り',cat:'サポート',desc:'次に受ける妨害を無効化',price:70,target:null}
-  };
-  const INTERF = {
-    jam:  {name:'ジャミング', desc:'あいてのマスを1つ閉じる'},
-    thief:{name:'ドロボー',   desc:'あいてのポイントを30減らす'},
-    lock: {name:'ロック',     desc:'次のターン、アイテムが使えない'}
-  };
-  const ITEM_KEYS = Object.keys(ITEMS);
   const DAUBERS = [
     {id:'pink',    name:'てれボン（ピンク）'},
     {id:'red',     name:'おこボン（赤）'},
@@ -458,24 +453,11 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     {id:'green', name:'もぐボン柄'}, {id:'purple', name:'ねむボン柄'}, {id:'pink', name:'てれボン柄'}, {id:'rainbow', name:'にじボン柄'}
   ];
   const GACHA_COST = 100, GACHA_DUP_COINS = 20;
-  const PERSONA = {
-    oko:  {jam:5, thief:5, lock:4, golden:2, free:2},
-    nico: {free:4, clover:3, time:2, box:2, boost:3, charm:2, double:2, shuffle:1},
-    hyoe: {},
-    mogu: {box:4, free:3, clover:2, golden:2, jam:1},
-    nemu: {clover:3, charm:3, time:1},
-    tere: {charm:5, free:2, shuffle:1},
-    niji: {},
-    boss: {jam:4, thief:4, lock:3, free:2, golden:2, double:1}
-  };
   const STORY = [
     {id:'nico', diff:'easy'}, {id:'nemu', diff:'easy'}, {id:'hyoe', diff:'normal'},
     {id:'mogu', diff:'normal'}, {id:'oko', diff:'normal'}, {id:'tere', diff:'hard'}, {id:'niji', diff:'hard'}
   ];
   const CHALLENGES = [
-    {id:'noitem', name:'アイテム禁止', desc:'アイテムを使わず、20ターン以内にビンゴを1つ揃える',
-      cfg:{useItems:false, maxTurns:20, cards:2, opp:'nico', diff:'easy'},
-      check:g => !g.itemUsed && g.player.cards.some(c => c.done.size > 0) && g.turn <= 20},
     {id:'onecard', name:'1枚のカードだけで勝利', desc:'カード1枚でNPCに勝つ',
       cfg:{cards:1, opp:'hyoe', diff:'normal'},
       check:g => score(g.player) > score(g.npc)},
@@ -490,7 +472,7 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
   /* ===== セーブ ===== */
   const SAVE_KEY = 'bonBingo.save.v2';
   const defaultSave = () => ({
-    coins:300, items:{clover:2, free:1, box:1}, owned:['oko','nico','hyoe','sakusha'], sel:'oko',
+    coins:300, items:{}, owned:['oko','nico','hyoe','sakusha'], sel:'oko',
     story:{}, bossDone:false, challenge:{}, tournClear:0,
     stats:{played:0, wins:0, bingos:0}, sett:{bgm:true, se:true, voice:true, auto:false},
     daub:{owned:['pink'], sel:'pink'}, frame:{owned:['museum'], sel:'museum'},
@@ -516,6 +498,14 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
   if(!save.login) save.login = {last:'', streak:0, total:0};
   if(!save.cum) save.cum = {claimed:[]};
   if(!save.seen) save.seen = {items:{}};
+  if(!save.rank) save.rank = {pt:0, claimed:[]};
+  if(save.sett.fx === undefined) save.sett.fx = true;
+  if(save.sett.bonvoice === undefined) save.sett.bonvoice = true;
+  if(!save.bond) save.bond = {};
+  const fxOn = () => save.sett.fx !== false;
+  const seVol = () => (save.sett.sevol === undefined ? 100 : save.sett.sevol) / 100;
+  function applyAnim(){ document.body.classList.toggle('anim-off', save.sett.anim === 'off'); document.body.classList.toggle('anim-fast', save.sett.anim === 'fast'); }
+  if(!save.roul) save.roul = {date:''};
   const csOf = id => (save.cs[id] = save.cs[id] || {played:0, win:0, lose:0, bingo:0, exp:0});
   const lvOf = id => Math.min(10, 1 + Math.floor(Math.sqrt(csOf(id).exp / 15)));
   const recOf = m => (save.rec[m] = save.rec[m] || {played:0, best:0});
@@ -529,9 +519,56 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     niji:{win:'にじいろの かち！', lose:'また にじが かかるさ', bingo:'にじいろビンゴ！'},
     sakusha:{win:'やったね！ いい勝負だった', lose:'むむ…次は負けないぞ', bingo:'ビンゴ！ いいね！'}
   };
-  const LVUP = {oko:'ゴールド+5pt／Lv', nico:'回復率+2%／Lv', hyoe:'Lv6でヒント範囲が広がる', mogu:'獲得率+2%／Lv', nemu:'3Lvごとに無効ターン+1', tere:'防御率+3%／Lv', niji:'発動率+2%／Lv', sakusha:'（コインのみ）'};
-  /* チケット：時間で溜まる（10分に1枚、最大5枚。オフラインでも経過時間で加算） */
-  const TK_MAX = 5, TK_INT = 10 * 60 * 1000;
+  const LVUP_PLACE = 0;
+  const LVUP = {oko:'ゴールド+5pt／Lv', nico:'ボーナス+2pt／Lv', hyoe:'Lv6でヒント範囲が広がる', mogu:'コイン+2／Lv', nemu:'3Lvごとに効果ターン+1', tere:'ボーナス+5pt／Lv', niji:'発動率+2%／Lv', sakusha:'（コインのみ）'};
+
+  const PICORDER = ['oko','nico','hyoe','mogu','nemu','tere','niji','sakusha'];
+  const vLabel = v => (G && G.cfg && G.cfg.pic) ? CHAR[PICORDER[(v - 1) % 15]].name.replace('ボン', '') : v;
+  { const st = document.createElement('style'); st.textContent = PICORDER.map((id, i) => `.cell.bz.bzf-${i}{background-image:url("${PIC[id]}")}`).join(''); document.head.appendChild(st); }
+  const BONCALL = {oko:c => `ほらっ、${c}！`, nico:c => `${c}だよ〜！`, hyoe:c => `ひょえっ、${c}…`, mogu:c => `${c}、もぐもぐ`, nemu:c => `ふぁ…${c}…`, tere:c => `え、えっと…${c}…`, niji:c => `にじいろ、${c}！`, sakusha:c => `${c}、いくよ`};
+  function bonCall(n, who){
+    let base = `${READ_LETTER[LET[Math.floor((n - 1) / 15)]]}の${jaNum(n)}`;
+    if(G && G.cfg && G.cfg.pic && who === (G.player && G.player.char)) base = `${READ_LETTER[LET[Math.floor((n - 1) / 15)]]}の${CHAR[PICORDER[(n - 1) % 15]].name}`;
+    if(save.sett.bonvoice === false || !BONCALL[who]) return base;
+    return BONCALL[who](base);
+  }
+  const TALK = {
+    oko:{start:'かかってこいっ！', reach:'リーチだ！ 見てろよ！', envy:'ぐぬぬ…！ やるなっ！'},
+    nico:{start:'よろしくね〜！ にこにこっ！', reach:'リーチだよ〜！ どきどき！', envy:'わあ、すごーい！'},
+    hyoe:{start:'ひょえ…よ、よろしく…', reach:'ひょえっ、リーチ…！？', envy:'ひょえぇ…やられた…'},
+    nemu:{start:'ふぁ…はじめよ…', reach:'むにゃ…リーチ…', envy:'ん…やるじゃん…'},
+    mogu:{start:'もぐもぐ…よろしくっ', reach:'リーチ！ おかわり！', envy:'むぐっ！ のどにつまった！'},
+    tere:{start:'よ、よろしくね…えへ', reach:'り、リーチ…ど、どうしよう', envy:'す、すごい…！'},
+    niji:{start:'にじいろに いこう！', reach:'にじが みえてきた！', envy:'きれいな ビンゴだね'},
+    sakusha:{start:'いい勝負にしよう！', reach:'リーチだ。ここからだ', envy:'やるね。次は負けない'}
+  };
+  const SECRET = {
+    oko:'ほんとは…お前と遊ぶの、いちばん楽しいんだぜ', nico:'いっしょにいると、ずーっとにこにこできるよ！', hyoe:'こ、こわくない…きみといっしょなら…！',
+    nemu:'きみのそばだと…いちばんよく眠れる…', mogu:'とっておきのおやつ、きみにもわけてあげる', tere:'あ、あのね…いつもありがと…',
+    niji:'きみと見る虹は、いつもよりきれいだよ', sakusha:'ボンたちを描いてよかった。いっしょに遊んでくれてありがとう'
+  };
+  const bubTm = {};
+  function bub(w, t, ms){ const el = $(w + 'Bub'); if(!el || !t) return; el.textContent = t; el.classList.remove('hidden'); clearTimeout(bubTm[w]); bubTm[w] = setTimeout(() => el.classList.add('hidden'), ms || 2800); }
+  const BOND_AT = [0, 10, 25, 50, 90, 150];
+  const bondOf = id => (save.bond[id] = save.bond[id] || {xp:0});
+  const bondLv = id => { let k = 0; BOND_AT.forEach((a, i) => { if(bondOf(id).xp >= a) k = i; }); return k; };
+  const hearts = id => '♥'.repeat(bondLv(id)) + '♡'.repeat(5 - bondLv(id));
+  const COSM = {oko:'red', nico:'yellow', hyoe:'blue', mogu:'green', nemu:'purple', tere:'pink', niji:'rainbow'};
+  function bondAdd(id, x){
+    if(!CHAR[id]) return '';
+    const b0 = bondLv(id); bondOf(id).xp += x; const b1 = bondLv(id); let out = '';
+    for(let l = b0 + 1; l <= b1; l++){
+      out += `${CHAR[id].name}と なかよし♥${l}！ `;
+      const c = COSM[id];
+      if(l === 2){ if(c && !save.daub.owned.includes(c)){ save.daub.owned.push(c); out += '（ダウバー解放）'; } else { save.coins += 100; out += '（+100コイン）'; } }
+      else if(l === 3){ if(c && !save.cskin.owned.includes(c)){ save.cskin.owned.push(c); out += '（カード柄解放）'; } else { save.coins += 100; out += '（+100コイン）'; } }
+      else if(l === 4) out += '（ひみつのセリフ解放）';
+      else if(l === 5){ save.coins += 300; out += '（+300コイン）'; }
+    }
+    return out;
+  }
+  /* チケット：時間で溜まる（5分に1枚、最大10枚。オフラインでも経過時間で加算） */
+  const TK_MAX = 10, TK_INT = 5 * 60 * 1000;
   function tkUpdate(){
     const now = Date.now();
     if(save.tk.n >= TK_MAX){ save.tk.t = now; return; }
@@ -554,7 +591,7 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     const t = c.currentTime + (when || 0);
     const o = c.createOscillator(), g = c.createGain();
     o.type = type || 'square'; o.frequency.value = freq;
-    g.gain.setValueAtTime(vol || 0.1, t);
+    g.gain.setValueAtTime((vol || 0.1) * seVol(), t);
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     o.connect(g); g.connect(c.destination);
     o.start(t); o.stop(t + dur + 0.02);
@@ -606,6 +643,7 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
   function resizeFx(){ cv.width = innerWidth; cv.height = innerHeight; }
   window.addEventListener('resize', resizeFx); resizeFx();
   function confetti(n){
+    if(!fxOn()) return;
     const cols = ['#ff7aa2','#ffd54a','#7be0b5','#4fc3f7','#b58cf0'];
     for(let i=0;i<n;i++) parts.push({x:innerWidth/2, y:innerHeight*0.35, vx:(Math.random()-0.5)*14, vy:-Math.random()*12-4, g:0.3, c:cols[i%cols.length], s:6+Math.random()*6, life:110});
     if(!raf) raf = requestAnimationFrame(fxLoop);
@@ -623,10 +661,10 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
     return a;
   }
-  function makeCard(){
+  function makeCard(pic){
     const cols = [];
     for(let c=0;c<5;c++){
-      const pool = Array.from({length:15}, (_,i) => c*15+i+1);
+      const pool = Array.from({length: pic ? 8 : 15}, (_,i) => c*15+i+1);
       shuffle(pool); cols.push(pool.slice(0,5));
     }
     cols[2][2] = 0; // FREE
@@ -690,7 +728,7 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     $('coinsTitle').textContent = s.coins;
     $('tkTitle').textContent = `${s.tk.n} / ${TK_MAX}`;
     $('tkNext').textContent = s.tk.n >= TK_MAX ? '' : `（あと${tkWait()}分で+1）`;
-    $('recordTitle').textContent = `戦績 ${s.stats.played}戦 ${s.stats.wins}勝`;
+    $('recordTitle').textContent = `戦績 ${s.stats.played}戦 ${s.stats.wins}勝　ランク ${RANKS[rankIdx(s.rank.pt)].n}`;
     $('selPortrait').innerHTML = portrait(s.sel);
     $('selPortrait').className = 'portrait-sm frm-' + s.frame.sel;
     $('selName').textContent = CHAR[s.sel].name + (s.titles.sel ? `\n「${s.titles.sel}」` : '');
@@ -715,6 +753,7 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     if(mode === 'howto') return openHowto();
     if(mode === 'mission') return openMission();
     if(mode === 'modes') return openModes();
+    if(mode === 'roulette') return openRoulette();
     if(mode === 'stats') return openStats();
     if(mode === 'titles') return openTitles();
     if(mode === 'shop') return go('shop');
@@ -747,7 +786,6 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
       ${optRow('speed','抽選ペース',[['slow','ゆっくり'],['normal','ふつう'],['fast','はやい']],FREE_SET.speed)}
       ${optRow('maxTurns','規定ターン',[[20,'20'],[30,'30'],[50,'50']],FREE_SET.maxTurns)}
       ${optRow('diff','NPCの強さ',[['easy','やさしい'],['normal','ふつう'],['hard','つよい']],FREE_SET.diff)}
-      ${optRow('useItems','アイテム',[[true,'あり'],[false,'なし']],FREE_SET.useItems)}
     </div>
     <div class="btn-row"><button class="btn" id="freeStart">スタート</button></div>`;
     bindOpts($('listBody'), FREE_SET);
@@ -802,7 +840,7 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
       const own = isOwned(id), c = CHAR[id];
       return `<div class="prow">${portrait(id,'').replace('<img','<img style="width:70px;height:80px;object-fit:contain"')}
         <div class="info"><b>${c.name}<span class="tag ${own?'ok':'lock'}">${own?'仲間':'未解放'}</span>${save.sel===id?'<span class="tag ok">選択中</span>':''}</b>
-        <small>${own ? `Lv${lvOf(id)}（EXP ${csOf(id).exp}）　${c.skill}<br>Lvが上がると：${LVUP[id]}　／　全員：コイン+3%／Lv<br>${csOf(id).played}戦 ${csOf(id).win}勝 ${csOf(id).lose}敗　使用${csOf(id).played}回　「${REACT[id].bingo}」` : 'ストーリーで対戦相手に勝つと仲間になる'}</small></div>
+        <small>${own ? `Lv${lvOf(id)}（EXP ${csOf(id).exp}）　${c.skill}<br>Lvが上がると：${LVUP[id]}　／　全員：コイン+3%／Lv<br>${csOf(id).played}戦 ${csOf(id).win}勝 ${csOf(id).lose}敗　使用${csOf(id).played}回　「${REACT[id].bingo}」<br>なかよし ${hearts(id)}${bondLv(id) >= 4 ? '<br>ひみつ：「' + SECRET[id] + '」' : ''}` : 'ストーリーで対戦相手に勝つと仲間になる'}</small></div>
         <button class="btn small" data-pick="${id}" ${own?'':'disabled'}>えらぶ</button></div>`;
     }).join('');
     $('listBody').innerHTML = `<div class="plist">${rows}</div>`;
@@ -814,14 +852,57 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
 
   function openSett(){
     listHead('設定');
-    const t = (k,label) => `<div class="row"><span>${label}</span><div class="opts"><button class="opt" data-tog="${k}" data-v="true" aria-pressed="${save.sett[k]}">ON</button><button class="opt" data-tog="${k}" data-v="false" aria-pressed="${!save.sett[k]}">OFF</button></div></div>`;
-    $('listBody').innerHTML = `<div class="panel">${t('se','効果音')}${t('voice','音声（数字・ビンゴの読み上げ）')}<div class="row"><span>読み上げの言語</span><div class="opts"><button class="opt" data-vl="ja" aria-pressed="${save.sett.vlang !== 'en'}">日本語</button><button class="opt" data-vl="en" aria-pressed="${save.sett.vlang === 'en'}">English</button></div></div>${t('auto','オート（出た数字を自動で開く）')}</div>`;
+    const t = (k,label) => `<div class="row"><span>${label}</span><div class="opts"><button class="opt" data-tog="${k}" data-v="true" aria-pressed="${save.sett[k] !== false && !!save.sett[k]}">ON</button><button class="opt" data-tog="${k}" data-v="false" aria-pressed="${save.sett[k] === false || !save.sett[k]}">OFF</button></div></div>`;
+    const grp = (label, key, opts, cur) => `<div class="row"><span>${label}</span><div class="opts">${opts.map(([v, l]) => `<button class="opt" data-set="${key}" data-v="${v}" aria-pressed="${String(v) === String(cur)}">${l}</button>`).join('')}</div></div>`;
+    $('listBody').innerHTML = `<div class="panel"><h2>音</h2>${t('se','効果音')}${grp('効果音の音量','sevol',[[35,'小'],[70,'中'],[100,'大']], save.sett.sevol === undefined ? 100 : save.sett.sevol)}${t('voice','音声（数字・ビンゴの読み上げ）')}${t('bonvoice','数字をボンの口調で読み上げ（日本語）')}
+      <div class="row"><span>読み上げの言語</span><div class="opts"><button class="opt" data-vl="ja" aria-pressed="${save.sett.vlang !== 'en'}">日本語</button><button class="opt" data-vl="en" aria-pressed="${save.sett.vlang === 'en'}">English</button></div></div>
+      <h2>あそびかた</h2>${t('auto','オート（出た数字を自動で開く）')}${grp('抽選ペース（ふだん）','dspeed',[['slow','ゆっくり'],['normal','ふつう'],['fast','はやい']], save.sett.dspeed || 'normal')}
+      <h2>表示</h2>${t('fx','ビンゴの派手な演出（紙吹雪・フラッシュ）')}${grp('アニメの速さ','anim',[['normal','ふつう'],['fast','はやい'],['off','なし']], save.sett.anim || 'normal')}
+      <h2>セーブデータ</h2><div class="row"><span>データの書き出し<br><small>ファイルに保存（バックアップ）</small></span><button class="btn small" data-act="export">書き出す</button></div>
+      <div class="row"><span>データの読み込み<br><small>書き出したファイルから復元</small></span><button class="btn small sub" data-act="import">読み込む</button></div>
+      <div class="row"><span>データを消す<br><small>はじめからやり直す</small></span><button class="btn small sub" data-act="reset">消す</button></div>
+      <input type="file" id="saveFile" accept=".json,application/json" class="hidden"></div>`;
+    $('saveFile').onchange = e => {
+      const f = e.target.files[0]; if(!f) return;
+      const rd = new FileReader();
+      rd.onload = () => {
+        try {
+          const o = JSON.parse(rd.result);
+          if(!o || typeof o !== 'object' || typeof o.coins !== 'number' || !o.stats) throw new Error('bad');
+          if(!confirm('いまのデータは上書きされるよ。読み込む？')) return;
+          try { localStorage.setItem(SAVE_KEY + '.bak', localStorage.getItem(SAVE_KEY) || ''); } catch(_){}
+          localStorage.setItem(SAVE_KEY, JSON.stringify(o)); location.reload();
+        } catch(err){ toast('このファイルは読み込めないよ'); }
+      };
+      rd.readAsText(f);
+    };
     $('listBody').onclick = e => {
       const vl = e.target.closest('[data-vl]');
       if(vl){ save.sett.vlang = vl.dataset.vl; writeSave(); openSett(); say('ビンゴ！', 'Bingo!'); return; }
+      const st = e.target.closest('[data-set]');
+      if(st){
+        const k = st.dataset.set, v = st.dataset.v;
+        save.sett[k] = k === 'sevol' ? Number(v) : v; writeSave(); applyAnim(); openSett();
+        if(k === 'sevol') sfx('item'); return;
+      }
+      const ac2 = e.target.closest('[data-act]');
+      if(ac2){
+        const act = ac2.dataset.act;
+        if(act === 'export'){
+          const blob = new Blob([JSON.stringify(save)], {type:'application/json'});
+          const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'bon-bingo-save.json';
+          document.body.appendChild(a); a.click(); a.remove(); toast('書き出したよ');
+        } else if(act === 'import'){ $('saveFile').click(); }
+        else if(act === 'reset'){
+          if(confirm('セーブデータを全部消す？（もとに戻せないよ）') && confirm('ほんとうに消していい？')){
+            try { localStorage.setItem(SAVE_KEY + '.bak', localStorage.getItem(SAVE_KEY) || ''); localStorage.removeItem(SAVE_KEY); } catch(_){}
+            location.reload();
+          }
+        }
+        return;
+      }
       const b = e.target.closest('[data-tog]'); if(!b) return;
       save.sett[b.dataset.tog] = b.dataset.v === 'true'; writeSave();
-      if(save.sett.bgm) bgmStart(); else bgmStop();
       openSett();
     };
   }
@@ -844,28 +925,6 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
   }
 
   /* ===== 対戦の開始 ===== */
-  function initItems(count, id){
-    const pool = ITEM_KEYS.concat(Object.keys(INTERF));
-    const items = {};
-    for(let i=0;i<count;i++){
-      const weighted = pool.map(k => [k, weightOf(id,k)]);
-      const total = weighted.reduce((s,[,w]) => s+w, 0);
-      let r = Math.random()*total, pick = pool[0];
-      for(const [k,w] of weighted){ if((r -= w) < 0){ pick = k; break; } }
-      items[pick] = (items[pick]||0) + 1;
-    }
-    return items;
-  }
-  function weightOf(id, k){
-    const t = PERSONA[id] || {};
-    if(!Object.keys(t).length) return 1;
-    return t[k] || 0.2;
-  }
-
-  const METER_NEED = 3, METER_MAX = 5;
-  const RARE = new Set(['line','golden','double','boost']);
-  const itemCost = k => RARE.has(k) ? 5 : 3;
-  ITEM_KEYS.forEach(k => { ITEMS[k].desc += RARE.has(k) ? '（★レア：メーター5）' : '（メーター3）'; });
   function startGame(cfg){
     const freeEntry = (cfg.mode === 'tournament' && T && T.round > 1) || (cfg.mode === 'survival' && SV && SV.round > 1);
     tkUpdate();
@@ -875,29 +934,26 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
   }
   function beginGame(cfg, bring, freeEntry){
     if(!freeEntry && !save.dbg){ tkUpdate(); save.tk.n--; writeSave(); }
-    const deck = shuffle(Array.from({length:75}, (_,i) => i+1));
+    const deck = shuffle(Array.from({length:75}, (_,i) => i+1).filter(v => !cfg.pic || (v - 1) % 15 < 8));
     const d = DIFF[cfg.diff] || DIFF.normal;
     const pChar = save.sel;
-    const mk = n => Array.from({length:n}, () => makeCard());
+    const mk = n => Array.from({length:n}, () => makeCard(!!cfg.pic));
     G = {
-      cfg, mode:cfg.mode, deck, drawn:[], turn:0, maxTurns:cfg.maxTurns, speed:cfg.speed || 'normal',
-      paused:false, over:false, useItems:cfg.useItems !== false, itemUsed:false, itemTurn:-1, meter:0, fills:0, lucky:null, coinGain:0,
-      ticket:[], rerollNext:false, doubleNext:false, boostLeft:0, cloverNum:null,
+      cfg, mode:cfg.mode, deck, drawn:[], turn:0, maxTurns:cfg.maxTurns, speed:(cfg.speed === 'normal' && save.sett.dspeed) ? save.sett.dspeed : (cfg.speed || 'normal'),
+      paused:false, over:false, lucky:null, coinGain:0,
       target:null, logs:[], lastFlash:new Set(), hints:new Set(), boss:!!cfg.boss,
       challenge:cfg.challenge || null,
-      player:{char:pChar, cards:mk(cfg.cards), adj:0, charm:false, lockTurns:0,
-        immuneUntil: pChar === 'nemu' ? 8 + Math.floor((lvOf('nemu') - 1) / 3) : 0, boostLeft:0},
+      player:{char:pChar, cards:mk(cfg.cards), adj:0},
       npc:{id:cfg.opp, char:cfg.opp, name:CHAR[cfg.opp].name, prob:d.prob, act:d.act,
-        cards:mk(cfg.npcCards || cfg.cards), items:initItems(d.items, cfg.opp), adj:0, boostLeft:0}
+        cards:mk(cfg.npcCards || cfg.cards), adj:0}
     };
     { const nums = G.player.cards[0].nums.flat().filter(v => v > 0); G.lucky = nums[Math.floor(Math.random() * nums.length)]; }
-    $('modeText').textContent = {story:'ストーリー', free:'フリービンゴ', tournament:`トーナメント ${T ? T.round : ''}回戦`, challenge:'チャレンジ：' + (cfg.challenge ? cfg.challenge.name : ''), boss:'ボスビンゴ', mystery:'ミステリービンゴ', endless:'エンドレスビンゴ', survival:`サバイバル ${SV ? SV.round : 1}戦目`, double:'ダブルビンゴ（目標：ビンゴ4本）'}[cfg.mode] || '';
+    $('modeText').textContent = {story:'ストーリー', free:'フリービンゴ', tournament:`トーナメント ${T ? T.round : ''}回戦`, challenge:'チャレンジ：' + (cfg.challenge ? cfg.challenge.name : ''), boss:'ボスビンゴ', mystery:'ミステリービンゴ', endless:'エンドレスビンゴ', survival:`サバイバル ${SV ? SV.round : 1}戦目`, double:'ダブルビンゴ（目標：ビンゴ4本）', rank:'リーグ戦（' + RANKS[rankIdx(save.rank.pt)].n + '）', pic:'ボンの絵柄ビンゴ'}[cfg.mode] || '';
     $('npcTitle').textContent = `${CHAR[cfg.opp].name}（NPC）`;
     $('pauseBtn').textContent = '一時停止';
     $('pauseBtn').setAttribute('aria-pressed', 'false');
     $('result').classList.add('hidden');
     $('pauseBtn').disabled = false;
-    cancelTarget(true);
     markSpeed();
     go('game');
     G.logs = [];
@@ -905,6 +961,8 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     applyLand();
     renderAll();
     bgmStart();
+    bub('n', TALK[cfg.opp].start);
+    setTimeout(() => bub('p', bondLv(pChar) >= 4 && Math.random() < 0.5 ? SECRET[pChar] : TALK[pChar].start), 600);
     startTimer();
   }
 
@@ -915,25 +973,13 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
   }
   function stopTimer(){ clearInterval(timer); timer = null; }
 
-  function nextNumber(){
-    if(G.ticket.length){
-      const n = G.ticket.shift(); const i = G.deck.indexOf(n);
-      if(i >= 0) G.deck.splice(i,1);
-      return n;
-    }
-    if(G.rerollNext){
-      G.rerollNext = false;
-      const first = G.deck.pop();
-      G.deck.splice(Math.floor(Math.random()*(G.deck.length+1)), 0, first);
-    }
-    return G.deck.pop();
-  }
+  function nextNumber(){ return G.deck.pop(); }
 
   function special(card, r, c){
     const k = r+','+c;
-    if(card.chest && card.chest.has(k)){ card.chest.delete(k); msg('宝箱マス！'); giveRandomItem(true); }
+    if(card.chest && card.chest.has(k)){ card.chest.delete(k); msg('宝箱マス！ +30コイン'); G.coinGain = (G.coinGain || 0) + 30; sfx('item'); }
     if(card.coin && card.coin.has(k)){ card.coin.delete(k); G.coinGain = (G.coinGain || 0) + 20; msg('コインマス！ +20コイン'); sfx('item'); }
-    if(G.lucky && card.nums[r][c] === G.lucky){ card.score += 50; msg('ラッキーナンバー！ +50pt'); }
+    if(G.lucky && card.nums[r][c] === G.lucky){ { const lp = G.player.char === 'tere' ? 100 + 5 * (lvOf('tere') - 1) : 50; card.score += lp; msg(`ラッキーナンバー！ +${lp}pt`); } }
   }
   function markCard(card, n, prob, prefix, flash, goldPts){
     let gold = 0;
@@ -952,38 +998,42 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
 
   function drawNext(){
     if(!G || G.over || G.paused) return;
+    if(G.decl && G.decl.turn < G.turn){ G.decl = null; $('declBtn').classList.add('hidden'); }
     if(G.turn >= G.maxTurns || !G.deck.length){ stopTimer(); setTimeout(finish, 500); return; }
     const P = G.player, N = G.npc;
-    if(P.lockTurns > 0) P.lockTurns--;
 
     const n = nextNumber();
-    G.turn++; G.drawn.push(n); G.cloverNum = null;
-    const dbl = G.doubleNext ? 2 : 1; G.doubleNext = false;
-    const pmult = dbl * (G.boostLeft > 0 ? 1.5 : 1);
-    const nmult = N.boostLeft > 0 ? 1.5 : 1;
-    if(G.boostLeft > 0) G.boostLeft--;
-    if(N.boostLeft > 0) N.boostLeft--;
+    G.turn++; G.drawn.push(n);
+    const dbl = 1, pmult = 1, nmult = 1;
 
     const flash = new Set();
     const goldP = (P.char === 'oko' ? 100 + 5 * (lvOf('oko') - 1) : 50) * dbl;
-    if(save.sett.auto){ P.cards.forEach((card, ci) => markCard(card, n, 1, 'p'+ci, flash, goldP)); charge([...flash].filter(k => k[0] === 'p').length); }
-    N.cards.forEach((card, ci) => markCard(card, n, N.prob, 'n'+ci, flash, 50));
+    if(save.sett.auto || G.cfg.many){ P.cards.forEach((card, ci) => markCard(card, n, 1, 'p'+ci, flash, goldP)); }
+    const nprob = N.prob * (P.char === 'nemu' && G.turn <= 8 + Math.floor((lvOf('nemu') - 1) / 3) ? 0.4 : 1);
+    N.cards.forEach((card, ci) => markCard(card, n, nprob, 'n'+ci, flash, 50));
+    if(G.boss && G.turn % 10 === 0){
+      const cs = []; N.cards.forEach(card => { for(let r = 0; r < 5; r++) for(let c = 0; c < 5; c++) if(!card.open[r][c] && card.nums[r][c] && G.drawn.includes(card.nums[r][c])) cs.push([card, r, c]); });
+      if(cs.length){ const [cd, r, c] = cs[Math.floor(Math.random() * cs.length)]; cd.open[r][c] = true; msg(`${N.name}の ボスのちから！ マスが1つ開いた`); }
+    }
     let pl = 0, nl = 0;
     P.cards.forEach(card => pl += settleCard(card, G.turn, G.maxTurns, pmult));
     N.cards.forEach(card => nl += settleCard(card, G.turn, G.maxTurns, nmult));
     G.lastFlash = flash;
     sfx('tick');
-    say(`${READ_LETTER[LET[Math.floor((n-1)/15)]]}の${jaNum(n)}`, `${LET[Math.floor((n-1)/15)]}, ${enNum(n)}`);
+    say(bonCall(n, P.char), G.cfg.pic ? `${LET[Math.floor((n-1)/15)]}, ${CHAR[PICORDER[(n - 1) % 15]].name}` : `${LET[Math.floor((n-1)/15)]}, ${enNum(n)}`);
+    if(G.cfg.pic) msg(`${LET[Math.floor((n - 1) / 15)]}の${CHAR[PICORDER[(n - 1) % 15]].name}！`);
 
     if(P.char === 'niji') randomSkill(true);
     if(N.char === 'niji') randomSkill(false);
 
+    { const nr0 = reachCount(N.cards), pr0 = reachCount(P.cards);
+      if(nr0 > (G.nr || 0) && !nl) bub('n', TALK[N.char].reach);
+      if(pr0 > (G.pr || 0) && !pl) bub('p', TALK[P.char].reach);
+      G.nr = nr0; G.pr = pr0; }
     if(pl > 0) afterPlayerLines(pl);
-    if(nl > 0){ sfx('npc'); msg(`${N.name}がビンゴ！`); }
+    if(nl > 0){ sfx('npc'); msg(`${N.name}がビンゴ！`); bub('n', REACT[N.char].bingo); bub('p', TALK[P.char].envy); }
 
     if(G.mode === 'mystery') mysteryEvent();
-    npcTurn();
-    if(G.boss && G.turn % 10 === 0) npcTurn();
 
     computeHints();
     renderAll();
@@ -992,18 +1042,23 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
 
   function afterPlayerLines(n){
     bingoFX(n);
-    const chance = G.player.char === 'mogu' ? 0.6 + 0.02 * (lvOf('mogu') - 1) : 0.3;
-    for(let i=0;i<n;i++) if(Math.random() < chance) giveRandomItem(true);
+    bub('p', REACT[G.player.char].bingo); bub('n', TALK[G.npc.char].envy);
+    G.decl = {n:(G.decl && G.decl.turn === G.turn ? G.decl.n : 0) + n, turn:G.turn}; $('declBtn').classList.remove('hidden');
+    const pc = G.player.char;
+    if(pc === 'nico'){ const b = (10 + 2 * (lvOf('nico') - 1)) * n; G.player.adj += b; msg(`にこボンの ちから！ ボーナス +${b}pt`); }
+    if(pc === 'mogu'){ const b = (15 + 2 * (lvOf('mogu') - 1)) * n; G.coinGain = (G.coinGain || 0) + b; msg(`もぐボンの ちから！ +${b}コイン`); }
   }
   function bingoFX(n){
     sfx('bingo');
     say(n > 1 ? 'ビンゴ、ダブル！' : 'ビンゴ！', n > 1 ? 'Double bingo!' : 'Bingo!');
     confetti(160);
+    if(fxOn()){
     const g = $('game'); g.classList.remove('shake'); void g.offsetWidth; g.classList.add('shake');
     const b = $('banner'); b.textContent = n > 1 ? `ビンゴ ×${n}！！` : 'ビンゴ！';
     b.classList.remove('show'); void b.offsetWidth; b.classList.add('show');
     clearTimeout(bingoFX.tm); bingoFX.tm = setTimeout(() => b.classList.remove('show'), 1000);
     const f = $('flash'); f.classList.add('on'); setTimeout(() => f.classList.remove('on'), 120);
+    }
     msg(`あなたのビンゴ！ 合計${n}ライン`);
     { const rc = REACT[G.player.char]; if(rc) msg(`${CHAR[G.player.char].name}「${rc.bingo}」`); }
   }
@@ -1026,9 +1081,8 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
       if(lines && isP) afterPlayerLines(lines);
       else if(lines) msg(`${G.npc.name}がビンゴ！`);
     } else {
-      if(isP){ giveRandomItem(true); }
-      else { const k = randomKey(); G.npc.items[k] = (G.npc.items[k]||0) + 1; }
-      msg(`にじボンの ちから！ ${who}がアイテムを獲得`);
+      if(isP) G.coinGain = (G.coinGain || 0) + 30; else side.adj += 10;
+      msg(`にじボンの ちから！ ${isP ? 'コイン+30' : who + ' +10pt'}`);
     }
   }
 
@@ -1052,239 +1106,31 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     });
   }
 
-  /* ===== アイテム ===== */
-  function randomKey(){ return ITEM_KEYS[Math.floor(Math.random()*ITEM_KEYS.length)]; }
-  function giveRandomItem(silent){
-    const k = randomKey();
-    save.items[k] = (save.items[k] || 0) + 1; save.seen.items[k] = 1; writeSave();
-    if(!silent) msg(`アイテム獲得：${ITEMS[k].name}`);
-    else msg(`アイテムを獲得：${ITEMS[k].name}`);
-    sfx('item');
-    return k;
-  }
-
-  function renderItems(){
-    const box = $('items');
-    if(!G || G.mode === 'challenge' && G.cfg.useItems === false || !G.useItems){
-      box.innerHTML = G && !G.useItems ? '<span class="nothing">このモードではアイテムは使えません</span>' : '';
-      return;
-    }
-    const locked = G.player.lockTurns > 0, ready = G.meter >= METER_NEED, usedNow = G.itemTurn === G.turn;
-    const list = ITEM_KEYS.filter(k => (save.items[k] || 0) > 0);
-    const meter = `<span class="meter">パワー ${'●'.repeat(G.meter)}${'○'.repeat(METER_MAX - G.meter)}${usedNow ? '（このターンは使用済み・1ターンに1個まで）' : (ready ? ' 使える！' : '（マスを開けてためよう）')}</span>`;
-    box.innerHTML = meter + (list.length
-      ? list.map(k => `<button class="btn item ${locked || usedNow || G.meter < itemCost(k) ? 'dis' : ''}" data-item="${k}"><b>${RARE.has(k) ? '★' : ''}${ITEMS[k].name} ×${save.items[k]}</b><small>${ITEMS[k].desc}</small></button>`).join('')
-      : '<span class="nothing">アイテムがありません（ショップで買えるよ）</span>');
-    if(locked) box.insertAdjacentHTML('afterbegin', '<span class="nothing">ロック中…次のターンまで使えない</span>');
-  }
-
-  function useItem(k){
-    if(!G || G.over || G.target) return;
-    if(!G.useItems){ msg('このモードではアイテムが使えない'); return; }
-    if(G.player.lockTurns > 0){ msg('ロック中！ アイテムは使えない'); return; }
-    if(G.itemTurn === G.turn){ toast('アイテムは1ターンに1個までだよ'); return; }
-    if(G.meter < itemCost(k)){ toast(`パワーメーターがたりないよ（${G.meter} / ${itemCost(k)}）`); return; }
-    if(!(save.items[k] > 0)) return;
-    const def = ITEMS[k];
-    if(def.target){ setTarget(k); return; }
-    spend(k);
-    applyItem(k, null);
-  }
-
-  function spend(k){
-    G.itemUsed = true; G.itemTurn = G.turn; save.st.used++; save.seen.items[k] = 1;
-    if(G.player.char === 'nico' && Math.random() < 0.3 + 0.02 * (lvOf('nico') - 1)){
-      msg('にこボンの ちから！ もう一度使えた');
-    } else {
-      save.items[k]--;
-    }
-    G.meter = Math.max(0, G.meter - itemCost(k));
-    writeSave();
-    sfx('item');
-  }
-
-  function applyItem(k, arg){
-    const P = G.player;
-    switch(k){
-      case 'clover': {
-        const next = G.ticket.length ? G.ticket[0] : G.deck[G.deck.length-1];
-        G.cloverNum = next;
-        msg(`ラッキークローバー：次の数字は「${next}」…？`); break;
-      }
-      case 'double': G.doubleNext = true; msg('ダブルナンバー！ 次の抽選は2倍'); break;
-      case 'reroll': G.rerollNext = true; msg('リロール！ 次の抽選をやり直す'); break;
-      case 'time': G.maxTurns += 5; msg('タイムプラス！ 制限ターン+5'); break;
-      case 'box': giveRandomItem(true); msg('アイテムボックスを開けた'); break;
-      case 'boost': G.boostLeft = 3; msg('ビンゴブースト！ 3ターンのあいだ報酬1.5倍'); break;
-      case 'charm': P.charm = true; msg('お守りを持った！ 次の妨害を防ぐ'); break;
-      case 'shuffle': shuffleCards(); msg('シャッフル！ カードの数字が入れ替わった'); break;
-      case 'free': {
-        const lines = openCell(P.cards[arg.ci], arg.r, arg.c, true);
-        msg('フリーマーク！ マスを開けた');
-        if(lines) afterPlayerLines(lines);
-        break;
-      }
-      case 'golden': {
-        P.cards[arg.ci].gold.add(arg.r+','+arg.c);
-        msg('ゴールデンマーク！ そのマスは得点アップ');
-        break;
-      }
-      case 'line': {
-        const cands = [];
-        P.cards.forEach((card,ci) => { for(let r=0;r<5;r++) if(!card.open[r][arg] && card.nums[r][arg]) cands.push([ci,r]); });
-        if(!cands.length){ msg('その列はもう開いてる'); break; }
-        const [ci,r] = cands[Math.floor(Math.random()*cands.length)];
-        const lines = openCell(P.cards[ci], r, arg, true);
-        msg(`ラインブースト！ ${LET[arg]}列のマスを開けた`);
-        if(lines) afterPlayerLines(lines);
-        break;
-      }
-      case 'ticket': {
-        G.ticket.push(arg);
-        msg(`ナンバーチケット！ 次に「${arg}」が出やすい…かも`);
-        break;
-      }
-    }
-    G.target = null;
-    renderAll();
-  }
-
-  function shuffleCards(){
-    G.player.cards.forEach(card => {
-      for(let c=0;c<5;c++){
-        const pos = [];
-        for(let r=0;r<5;r++) if(!card.open[r][c] && card.nums[r][c]) pos.push(r);
-        const vals = shuffle(pos.map(r => card.nums[r][c]));
-        pos.forEach((r,i) => card.nums[r][c] = vals[i]);
-      }
-    });
-  }
-
-  /* 対象選択 */
-  function setTarget(k){
-    G.target = k;
-    const t = ITEMS[k].target;
-    $('targetText').textContent = t === 'cell' ? `${ITEMS[k].name}：マスをタップしてね`
-      : t === 'col' ? `${ITEMS[k].name}：BINGOの文字をタップしてね` : `${ITEMS[k].name}：数字を入れてね`;
-    if(t === 'number') $('targetText').textContent = `${ITEMS[k].name}：数字を入れてね`;
-    if(t === 'number'){ openPicker(); }
-    else $('targetBar').classList.remove('hidden');
-    renderCards();
-  }
-  function cancelTarget(silent){
-    if(!G) return;
-    G.target = null;
-    $('targetBar').classList.add('hidden');
-    $('picker').classList.add('hidden');
-    if(!silent) renderAll();
-  }
-  $('targetCancel').addEventListener('click', () => cancelTarget(false));
-  function openPicker(){
-    $('pickNum').value = '';
-    $('picker').classList.remove('hidden');
-    setTimeout(() => $('pickNum').focus(), 50);
-  }
-  $('pickNo').addEventListener('click', () => cancelTarget(false));
-  $('pickOK').addEventListener('click', () => {
-    if(!G || G.target !== 'ticket') return cancelTarget(false);
-    const n = Number($('pickNum').value);
-    if(!Number.isInteger(n) || n < 1 || n > 75){ toast('1〜75の数字を入れてね'); return; }
-    if(!G.deck.includes(n)){ toast('その数字はもう出ています'); return; }
-    if(G.ticket.includes(n)){ toast('その数字はもう予約済み'); return; }
-    spend('ticket');
-    $('picker').classList.add('hidden');
-    applyItem('ticket', n);
-  });
-
-  /* ===== 妨害・NPC行動 ===== */
-  function hitPlayer(kind){
-    const P = G.player;
-    if(G.turn <= P.immuneUntil){ msg('ねむボンの ちからで むこうか！'); return; }
-    if(P.charm){ P.charm = false; msg(`${INTERF[kind].name}を お守りが ふせいだ！`); return; }
-    if(kind === 'jam'){
-      if(P.char === 'tere' && Math.random() < 0.5 + 0.03 * (lvOf('tere') - 1)){ msg('てれボンが ジャミングを ふせいだ！'); return; }
-      const cands = [];
-      P.cards.forEach((card,ci) => { for(let r=0;r<5;r++) for(let c=0;c<5;c++) if(card.open[r][c] && card.nums[r][c]) cands.push([ci,r,c]); });
-      if(!cands.length) return;
-      const [ci,r,c] = cands[Math.floor(Math.random()*cands.length)];
-      P.cards[ci].open[r][c] = false;
-      msg('ジャミング！ マスが閉じられた');
-    } else if(kind === 'thief'){
-      const dmg = P.char === 'tere' ? 15 : 30;
-      P.adj -= dmg; msg(`ドロボー！ あなた -${dmg}pt`);
-    } else if(kind === 'lock'){
-      P.lockTurns = 1; msg('ロック！ 次のターンはアイテムが使えない');
-    }
-    sfx('bad');
-  }
-
-  function npcTurn(){
-    const N = G.npc;
-    if(Math.random() > N.act) return;
-    const keys = Object.keys(N.items).filter(k => N.items[k] > 0);
-    if(!keys.length) return;
-    const weights = keys.map(k => weightOf(N.char === 'oko' && G.boss ? 'boss' : N.char, k));
-    const total = weights.reduce((s,w) => s+w, 0);
-    let r = Math.random()*total, pick = keys[0];
-    for(let i=0;i<keys.length;i++){ if((r -= weights[i]) < 0){ pick = keys[i]; break; } }
-    N.items[pick]--; if(N.items[pick] <= 0) delete N.items[pick];
-    npcUse(pick);
-    sfx('npc');
-  }
-
-  function npcUse(k){
-    const N = G.npc;
-    if(k === 'jam' || k === 'thief' || k === 'lock'){
-      msg(`${N.name}の ${INTERF[k].name}！`);
-      hitPlayer(k); return;
-    }
-    if(k === 'free' || k === 'golden' || k === 'line'){
-      const cands = [];
-      N.cards.forEach((card,ci) => { for(let r=0;r<5;r++) for(let c=0;c<5;c++) if(!card.open[r][c] && card.nums[r][c]) cands.push([ci,r,c]); });
-      if(!cands.length) return;
-      const [ci,r,c] = cands[Math.floor(Math.random()*cands.length)];
-      if(k === 'golden'){ N.cards[ci].gold.add(r+','+c); msg(`${N.name}が ゴールデンマーク`); return; }
-      const lines = openCell(N.cards[ci], r, c, false);
-      msg(`${N.name}が マスを開けた`);
-      if(lines){ msg(`${N.name}がビンゴ！`); }
-      return;
-    }
-    if(k === 'box'){ const kk = randomKey(); N.items[kk] = (N.items[kk]||0)+1; msg(`${N.name}が アイテムを拾った`); return; }
-    if(k === 'time' || k === 'double'){ N.adj += 20; msg(`${N.name}に ボーナス！`); return; }
-    if(k === 'boost'){ N.boostLeft = 3; msg(`${N.name}の ビンゴブースト！`); return; }
-    msg(`${N.name}は ${ITEMS[k].name}を使った`);
-  }
-
-  /* ===== 表示 ===== */
   function renderAll(){
-    $('autoBtn').setAttribute('aria-pressed', String(!!save.sett.auto));
-    $('dbgMeter').classList.toggle('hidden', !save.dbg);
+    $('autoBtn').setAttribute('aria-pressed', String(!!save.sett.auto || !!(G.cfg && G.cfg.many)));
     if(!G) return;
     const b = $('ballEl');
     const n = G.drawn[G.drawn.length-1];
     if(n === undefined){ $('ballLetter').textContent = '?'; $('ballNum').textContent = '-'; }
     else {
       $('ballLetter').textContent = LET[Math.floor((n-1)/15)];
-      $('ballNum').textContent = n;
+      $('ballNum').textContent = vLabel(n); $('ballNum').style.fontSize = G.cfg.pic ? '1.5rem' : '';
       b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
     }
     $('turnText').textContent = `${G.turn} / ${G.maxTurns}`;
-    $('luckyText').textContent = G.lucky || '-';
+    $('luckyText').textContent = G.lucky ? vLabel(G.lucky) : '-';
     $('deckLeft').textContent = G.deck.length;
     $('pScore').innerHTML = `ビンゴ ${lineCount(G.player.cards)}<small> リーチ${reachCount(G.player.cards)}・${score(G.player)}pt</small>`;
     $('nScore').innerHTML = `ビンゴ ${lineCount(G.npc.cards)}<small> リーチ${reachCount(G.npc.cards)}・${score(G.npc)}pt</small>`;
     $('pName').textContent = CHAR[G.player.char].name;
     $('pSkill').textContent = CHAR[G.player.char].skill;
     $('nName').textContent = G.npc.name;
-    $('nSkill').textContent = G.boss ? 'ボス：10ターンごとに二度行動' : CHAR[G.npc.char].skill;
+    $('nSkill').textContent = G.boss ? 'ボス：10ターンごとにマスが1つ勝手に開く' : CHAR[G.npc.char].skill;
     $('pPort').innerHTML = portrait(G.player.char);
     $('pPort').className = 'portrait-sm frm-' + save.frame.sel;
     $('nPort').innerHTML = portrait(G.npc.char);
-    $('targetBar').classList.toggle('hidden', !G.target || G.target === 'ticket');
-    $('ticker').textContent = G.cloverNum ? `予告：次は「${G.cloverNum}」` : (G.doubleNext ? '次の抽選：ポイント2倍' : (G.rerollNext ? '次の抽選：やり直し' : ''));
-    $('history').innerHTML = G.drawn.map((x,i) => `<span class="chip${i===G.drawn.length-1?' latest':''}">${x}</span>`).join('');
+    $('history').innerHTML = G.drawn.map((x,i) => `<span class="chip${i===G.drawn.length-1?' latest':''}">${vLabel(x)}</span>`).join('');
     renderCards();
-    renderItems();
     renderLog();
   }
   function renderLog(){
@@ -1301,12 +1147,12 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     if(isP && v > 0 && !card.open[r][c] && G && G.drawn.includes(v)) cls += ' ready';
     if(isP && !card.open[r][c] && card.gold.has(k)) cls += ' gold';
     if(isP && !card.open[r][c] && v > 0){ if(card.chest.has(k)) cls += ' chest'; else if(card.coin.has(k)) cls += ' coinc'; else if(G && G.lucky === v) cls += ' lucky'; }
-    if(isP && (G.target === 'free' || G.target === 'golden') && !card.open[r][c]) cls += ' pick';
+    if(G && G.cfg && G.cfg.pic && v > 0){ cls += ' pcell'; if(!card.open[r][c]) cls += ' bz bzf-' + ((v - 1) % 15); }
     const data = isP ? ` data-ci="${ci}" data-r="${r}" data-c="${c}"` : '';
-    return `<div class="${cls}"${data}>${v === 0 ? 'FREE' : v}</div>`;
+    return `<div class="${cls}"${data}>${v === 0 ? 'FREE' : vLabel(v)}</div>`;
   }
   function cardHTML(card, ci, isP, flash, hints){
-    const head = LET.map((l,c) => `<div${isP ? ` class="${G && G.target === 'line' ? 'targetable' : ''}" data-hcol="${c}" data-ci="${ci}"` : ''}>${l}</div>`).join('');
+    const head = LET.map(l => `<div>${l}</div>`).join('');
     let cells = '';
     for(let r=0;r<5;r++) for(let c=0;c<5;c++) cells += cellHTML(card, ci, r, c, isP, flash, hints);
     return `<div class="card-wrap"><h3>カード${ci+1}${isP ? '' : '　'+(G.npc.cards.length ? '' : '')}</h3><div class="hdr">${head}</div><div class="bingo-card cs-${isP ? save.cskin.sel : 'plain'}">${cells}</div></div>`;
@@ -1330,15 +1176,20 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     if(!G.view) G.view = {who:'p', page:0};
     if(!$('game').classList.contains('land')){
       $('pTitle').classList.remove('hidden'); $('npcTitle').classList.remove('hidden');
+      const many = !!G.cfg.many;
+      $('playerCards').classList.toggle('many', many); $('npcCards').classList.toggle('many', many);
       $('playerCards').innerHTML = G.player.cards.map((c,i) => cardHTML(c, i, true, flash, G.hints)).join('');
-      $('npcCards').innerHTML = G.npc.cards.map((c,i) => cardHTML(c, i, false, flash, G.hints)).join('');
+      $('npcCards').innerHTML = many ? '' : G.npc.cards.map((c,i) => cardHTML(c, i, false, flash, G.hints)).join('');
+      if(many) $('npcTitle').classList.add('hidden');
       return;
     }
     const v = G.view, isP = v.who === 'p';
     const list = isP ? G.player.cards : G.npc.cards;
-    const pages = Math.max(1, Math.ceil(list.length / 2));
+    const per = G.cfg.many ? 4 : 2;
+    $('playerCards').classList.toggle('many', !!G.cfg.many); $('npcCards').classList.toggle('many', !!G.cfg.many);
+    const pages = Math.max(1, Math.ceil(list.length / per));
     v.page = Math.max(0, Math.min(v.page, pages - 1));
-    const html = list.map((c,i) => [c,i]).slice(v.page * 2, v.page * 2 + 2).map(([c,i]) => cardHTML(c, i, isP, flash, G.hints)).join('');
+    const html = list.map((c,i) => [c,i]).slice(v.page * per, v.page * per + per).map(([c,i]) => cardHTML(c, i, isP, flash, G.hints)).join('');
     $('playerCards').innerHTML = isP ? html : ''; $('npcCards').innerHTML = isP ? '' : html;
     $('pTitle').classList.add('hidden'); $('npcTitle').classList.add('hidden');
     $('viewWho').textContent = isP ? 'あなたのカード ⇄ あいて' : `${G.npc.name}のカード ⇄ あなた`;
@@ -1348,51 +1199,27 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
 
   $('playerCards').addEventListener('click', e => {
     if(!G || G.over) return;
-    const hd = e.target.closest('[data-hcol]');
-    if(hd){
-      if(G.target === 'line'){
-        const c = Number(hd.dataset.hcol);
-        spend('line');
-        applyItem('line', c);
-      }
-      return;
-    }
     const cell = e.target.closest('[data-r]');
-    if(cell && !G.target){ manualMark(Number(cell.dataset.ci), Number(cell.dataset.r), Number(cell.dataset.c)); return; }
-    if(!cell || !G.target) return;
-    const ci = Number(cell.dataset.ci), r = Number(cell.dataset.r), c = Number(cell.dataset.c);
-    const card = G.player.cards[ci];
-    if(G.target === 'free'){
-      if(card.open[r][c]){ toast('そのマスはもう開いてるよ'); return; }
-      spend('free'); applyItem('free', {ci,r,c}); $('targetBar').classList.add('hidden');
-    } else if(G.target === 'golden'){
-      if(card.open[r][c]){ toast('開いたマスには付けられないよ'); return; }
-      spend('golden'); applyItem('golden', {ci,r,c}); $('targetBar').classList.add('hidden');
-    }
+    if(cell) manualMark(Number(cell.dataset.ci), Number(cell.dataset.r), Number(cell.dataset.c));
   });
 
-  function charge(n){
-    if(!G || n <= 0) return;
-    if(G.player.char === 'sakusha'){ G.sakuN = (G.sakuN || 0) + 1; if(G.sakuN % 2 === 0) n += 1; }
-    const was = G.meter; G.meter = Math.min(METER_MAX, G.meter + n);
-    if(was < METER_NEED && G.meter >= METER_NEED){ G.fills++; if(G.fills % 5 === 0){ msg('ボーナス！メーター5回目で無料アイテム'); giveRandomItem(false); } }
-  }
   function manualMark(ci, r, c){
     const card = G.player.cards[ci], v = card.nums[r][c];
     if(v === 0 || card.open[r][c]) return;
     if(!G.drawn.includes(v)){ toast('まだ出てない数字だよ'); return; }
     const lines = openCell(card, r, c, true);
     G.lastFlash = new Set([`p${ci}-${r}-${c}`]);
-    sfx('tick'); charge(1);
+    sfx('tick');
     if(lines) afterPlayerLines(lines);
     computeHints(); renderAll();
   }
   function setAuto(on){
+    if(G && G.cfg && G.cfg.many && !G.over){ toast('おおぜいビンゴはオート専用だよ'); return; }
     save.sett.auto = on; writeSave();
     if(on && G && !G.over){
       let lines = 0;
       G.player.cards.forEach(card => { for(let r=0;r<5;r++) for(let c=0;c<5;c++){
-        const v = card.nums[r][c]; if(v > 0 && !card.open[r][c] && G.drawn.includes(v)){ lines += openCell(card, r, c, true); charge(1); }
+        const v = card.nums[r][c]; if(v > 0 && !card.open[r][c] && G.drawn.includes(v)){ lines += openCell(card, r, c, true); }
       }});
       if(lines) afterPlayerLines(lines);
       computeHints(); renderAll();
@@ -1402,11 +1229,6 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
   }
   $('autoBtn').addEventListener('click', () => setAuto(!save.sett.auto));
 
-  $('items').addEventListener('click', e => {
-    const b = e.target.closest('[data-item]');
-    if(b) useItem(b.dataset.item);
-  });
-
   /* ===== 操作 ===== */
   function togglePause(){
     if(!G || G.over) return;
@@ -1415,7 +1237,7 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     $('pauseBtn').setAttribute('aria-pressed', String(G.paused));
   }
   $('pauseBtn').addEventListener('click', togglePause);
-  $('quitBtn').addEventListener('click', goTitle);
+  $('quitBtn').addEventListener('click', () => { if(G && !G.over && !confirm('対戦をやめてタイトルに戻る？\n（使ったチケットは戻らないよ）')) return; goTitle(); });
   document.querySelectorAll('.spd').forEach(b => b.addEventListener('click', () => {
     if(!G || G.over) return;
     G.speed = b.dataset.val; markSpeed();
@@ -1426,12 +1248,51 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
   }
   document.addEventListener('keydown', e => {
     if(!G || G.over || $('game').classList.contains('hidden')) return;
-    if(e.code === 'Space' && $('picker').classList.contains('hidden')){ e.preventDefault(); togglePause(); }
-    if(e.code === 'Escape') cancelTarget(false);
+    if(e.code === 'Space'){ e.preventDefault(); togglePause(); }
   });
   document.addEventListener('pointerdown', () => { if(save.sett.bgm) bgmStart(); }, {once:true});
 
   /* ===== 終了 ===== */
+
+  /* ===== リーグ戦（ランク）・デイリールーレット・ビンゴ宣言 ===== */
+  const RANKS = [
+    {n:'ブロンズ', at:0, d:'easy', c:0}, {n:'シルバー', at:100, d:'easy', c:100}, {n:'ゴールド', at:250, d:'normal', c:200},
+    {n:'プラチナ', at:450, d:'normal', c:300}, {n:'ダイヤ', at:700, d:'hard', c:500}, {n:'ボンマスター', at:1000, d:'hard', c:1000}
+  ];
+  const rankIdx = pt => { let k = 0; RANKS.forEach((r, i) => { if(pt >= r.at) k = i; }); return k; };
+  $('declBtn').addEventListener('click', () => {
+    if(!G || G.over || !G.decl) return;
+    const n = G.decl.n, b = 30 * n * (G.player.char === 'sakusha' ? 2 : 1);
+    G.player.adj += b; G.decl = null; $('declBtn').classList.add('hidden');
+    sfx('win'); confetti(60); msg(`BINGO宣言！ 宣言ボーナス +${b}pt`); renderAll();
+  });
+  const ROUL = [{l:'50コイン', c:50}, {l:'100コイン', c:100}, {l:'300コイン', c:300}, {l:'50コイン', c:50}, {l:'チケット', t:1}, {l:'200コイン', c:200}, {l:'100コイン', c:100}, {l:'500コイン', c:500}];
+  const ROUL_W = [22, 18, 14, 22, 10, 6, 6, 2];
+  function openRoulette(){
+    listHead('デイリールーレット');
+    const done = save.roul.date === dayStr();
+    const cols = ['#ffd6e0', '#fff1b8'];
+    const grad = ROUL.map((_, i) => `${cols[i % 2]} ${i * 45}deg ${(i + 1) * 45}deg`).join(',');
+    const labels = ROUL.map((r, i) => `<span style="position:absolute;left:50%;top:50%;width:80px;margin:-8px 0 0 -40px;text-align:center;font:bold 12px system-ui;color:#3b2d4a;transform:rotate(${i * 45 + 22.5}deg) translateY(-88px)">${r.l}</span>`).join('');
+    $('listBody').innerHTML = `<div class="panel" style="text-align:center"><div style="position:relative;width:250px;height:280px;margin:0 auto">
+      <div style="position:absolute;left:50%;top:0;transform:translateX(-50%);font-size:28px;z-index:2">▼</div>
+      <div id="wheel" style="position:absolute;top:30px;left:5px;width:240px;height:240px;border-radius:50%;border:6px solid #fff;box-shadow:0 4px 0 rgba(59,45,74,.3);background:conic-gradient(${grad});transition:transform 3.2s cubic-bezier(.15,.7,.1,1)">${labels}</div></div>
+      <p id="roulMsg">${done ? 'きょうはもう回したよ。また明日！' : '1日1回、まわせるよ！'}</p>
+      <button class="btn" id="roulGo" ${done ? 'disabled' : ''}>まわす</button></div>`;
+    $('listBody').onclick = null;
+    $('roulGo').onclick = () => {
+      if(save.roul.date === dayStr()) return;
+      save.roul.date = dayStr();
+      const tot = ROUL_W.reduce((a, b) => a + b, 0); let x = Math.random() * tot, idx = 0;
+      for(let i = 0; i < ROUL_W.length; i++){ if((x -= ROUL_W[i]) < 0){ idx = i; break; } }
+      const r = ROUL[idx]; let txt = r.l;
+      if(r.c) save.coins += r.c;
+      if(r.t){ tkUpdate(); save.tk.n += r.t; }
+      writeSave(); $('roulGo').disabled = true; sfx('tick');
+      $('wheel').style.transform = `rotate(${360 * 5 - (idx * 45 + 22.5)}deg)`;
+      setTimeout(() => { $('roulMsg').textContent = `${txt} ゲット！`; sfx('win'); confetti(80); }, 3300);
+    };
+  }
 
   /* ===== 拡張：記録・キャラ成長・新モード ===== */
   function recordFinish(win, lines, ps, pl){
@@ -1445,9 +1306,12 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     let out = '', html = '';
     if(lv1 > lv0) out += `${CHAR[id].name}が Lv${lv1} に あがった！ `;
     const rc = REACT[id]; if(rc) html += `<br><i>${CHAR[id].name}「${win ? rc.win : rc.lose}」</i>`;
+    const oc = G.npc.char, orc = REACT[oc]; if(orc && oc !== id) html += `<br><i>${CHAR[oc].name}「${win ? orc.lose : orc.win}」</i>`;
+    out += bondAdd(id, 2 + (win ? 2 : 0));
+    if(oc !== id) out += bondAdd(oc, 1);
     if(G.mode === 'survival' && SV && win){ SV.wins++; SV.round++; }
     let metric = null, label = '';
-    if(G.mode === 'mystery' || G.mode === 'endless'){ metric = tot; label = 'スコア'; }
+    if(G.mode === 'mystery' || G.mode === 'endless' || G.mode === 'pic'){ metric = tot; label = 'スコア'; }
     else if(G.mode === 'double'){ metric = lines; label = 'ビンゴ本数'; }
     else if(G.mode === 'survival'){ metric = SV ? SV.wins : 0; label = '連勝'; }
     if(metric !== null){
@@ -1456,6 +1320,14 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
       html += `<br>${label}：${metric}　自己ベスト ${rec.best}${nb ? '　★更新！' : ''}`;
     }
     if(G.mode === 'survival' && !win) SV = null;
+    if(G.mode === 'rank'){
+      const i0 = rankIdx(save.rank.pt), d = win ? 25 + Math.min(save.st.streak - 1, 4) * 3 : -10;
+      save.rank.pt = Math.max(RANKS[i0].at, save.rank.pt + d);
+      const i1 = rankIdx(save.rank.pt);
+      html += `<br>ランクpt ${d >= 0 ? '+' : ''}${d}　→　${save.rank.pt}pt（${RANKS[i1].n}）`;
+      if(i1 > i0 && !save.rank.claimed.includes(i1)){ save.rank.claimed.push(i1); save.coins += RANKS[i1].c; out += `ランクアップ！ ${RANKS[i1].n}（+${RANKS[i1].c}コイン） `; }
+      else if(i1 > i0) out += `ランクアップ！ ${RANKS[i1].n} `;
+    }
     G.extraRes = html;
     return out;
   }
@@ -1469,7 +1341,7 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
   function mysteryEvent(){
     if(G.turn < 3 || Math.random() > 0.22) return;
     const P = G.player, r = Math.floor(Math.random() * 5);
-    if(r === 0){ const k = giveRandomItem(true); msg(`？イベント：${ITEMS[k].name}を見つけた！`); }
+    if(r === 0){ G.coinGain = (G.coinGain || 0) + 40; msg('？イベント：コインを拾った！ +40コイン'); }
     else if(r === 1){ P.adj += 40; msg('？イベント：スコアボーナス +40pt'); }
     else if(r === 2){ G.speed = Math.random() < 0.5 ? 'fast' : 'slow'; markSpeed(); startTimer(); msg(`？イベント：抽選が${G.speed === 'fast' ? 'はやく' : 'ゆっくり'}なった！`); }
     else if(r === 3){
@@ -1477,52 +1349,62 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
       P.cards.forEach((card, ci) => { for(let rr = 0; rr < 5; rr++) for(let cc = 0; cc < 5; cc++) if(!card.open[rr][cc] && card.nums[rr][cc]) cands.push([ci, rr, cc]); });
       if(cands.length){ const [ci, rr, cc] = cands[Math.floor(Math.random() * cands.length)]; const l = openCell(P.cards[ci], rr, cc, true); msg('？イベント：マスが勝手に開いた！'); if(l) afterPlayerLines(l); }
     }
-    else { G.boostLeft = 3; msg('？イベント：3ターン、ビンゴ報酬1.5倍！'); }
+    else { P.adj += 60; msg('？イベント：大ボーナス +60pt'); }
     sfx('item');
   }
+  let MANY_N = 12;
   const MODES2 = [
-    {id:'mystery', name:'ミステリービンゴ', desc:'ランダムイベントが起きる！ アイテム・ボーナス・抽選速度の変化…', met:'スコア',
+    {id:'mystery', name:'ミステリービンゴ', desc:'ランダムイベントが起きる！ コイン・ボーナス・抽選速度の変化…', met:'スコア',
       cfg:() => ({mode:'mystery', diff:'normal', cards:2, maxTurns:30, speed:'normal', useItems:true})},
     {id:'endless', name:'エンドレスビンゴ', desc:'75個ぜんぶ出るまで続く。スコアの自己ベストをねらおう', met:'スコア',
       cfg:() => ({mode:'endless', diff:'easy', cards:3, maxTurns:75, speed:'fast', useItems:true})},
-    {id:'survival', name:'サバイバルビンゴ', desc:'アイテム禁止・20ターンの勝ち抜き戦。相手がどんどん強くなる。負けたら終わり', met:'連勝',
+    {id:'survival', name:'サバイバルビンゴ', desc:'20ターンの勝ち抜き戦。相手がどんどん強くなる。負けたら終わり', met:'連勝',
       cfg:null},
+    {id:'rank', name:'リーグ戦', desc:'勝ってランクポイントをためて昇格！ 負けても降格はしないよ（昇格すると報酬）', met:'ランクpt',
+      cfg:() => ({mode:'rank', diff:RANKS[rankIdx(save.rank.pt)].d, cards:2, maxTurns:30, speed:'normal', useItems:true})},
+    {id:'pic', name:'ボンの絵柄ビンゴ', desc:'数字のかわりにボンがならぶ。1列に5人（8人の中から）。「ビーのひょえボン！」と呼ばれたら、B列のひょえボンのマスを開けよう', met:'スコア',
+      cfg:() => ({mode:'pic', pic:true, diff:'normal', cards:2, maxTurns:30, speed:'normal'})},
+    {id:'many', name:'おおぜいビンゴ', desc:'カードが8〜20枚！ オート専用でどんどんビンゴをふやそう。あいてもおなじ枚数', met:'ビンゴ本数',
+      cfg:() => ({mode:'many', many:true, diff:'normal', cards:MANY_N, maxTurns:30, speed:'normal'})},
     {id:'double', name:'ダブルビンゴ', desc:'カード3枚・40ターン。ビンゴを4本そろえたら勝ち！', met:'ビンゴ本数',
       cfg:() => ({mode:'double', diff:'easy', cards:3, maxTurns:40, speed:'normal', useItems:true})}
   ];
   function openModes(){
     SV = null; listHead('ほかのモード');
     const pool = ['oko','nico','hyoe','mogu','nemu','tere'];
-    $('listBody').innerHTML = `<div class="plist">` + MODES2.map(m => {
+    const ri = rankIdx(save.rank.pt), rn = RANKS[ri], rx = RANKS[ri + 1];
+    const rbox = `<div class="rankbox">リーグ戦ランク<br><b>${rn.n}</b>　${save.rank.pt}pt${rx ? `<div class="bar" style="margin:6px auto 0;max-width:240px"><i style="width:${Math.round((save.rank.pt - rn.at) / (rx.at - rn.at) * 100)}%"></i></div><small>次の${rx.n}まで あと${rx.at - save.rank.pt}pt</small>` : '<br><small>最高ランク！</small>'}</div>`;
+    const manyRow = `<div class="row" style="margin:6px 0"><span>おおぜいビンゴの枚数</span><div class="opts">${[8,10,12,16,20].map(n => `<button class="opt" data-mn="${n}" aria-pressed="${n === MANY_N}">${n}枚</button>`).join('')}</div></div>`;
+    $('listBody').innerHTML = rbox + manyRow + `<div class="plist">` + MODES2.map(m => {
       const r = recOf(m.id);
-      return `<div class="prow"><div class="info"><b>${m.name}</b><small>${m.desc}<br>自己ベスト（${m.met}）：${r.best}　プレイ ${r.played}回</small></div><button class="btn small" data-m2="${m.id}">あそぶ</button></div>`;
+      return `<div class="prow"><div class="info"><b>${m.name}</b><small>${m.desc}<br>${m.id === 'rank' ? `いまのランク：${RANKS[rankIdx(save.rank.pt)].n}（${save.rank.pt}pt）${rankIdx(save.rank.pt) < RANKS.length - 1 ? `／次まで あと${RANKS[rankIdx(save.rank.pt) + 1].at - save.rank.pt}pt` : ''}` : `自己ベスト（${m.met}）：${r.best}　プレイ ${r.played}回`}</small></div><button class="btn small" data-m2="${m.id}">あそぶ</button></div>`;
     }).join('') + `</div>`;
     $('listBody').onclick = e => {
+      const mn = e.target.closest('[data-mn]');
+      if(mn){ MANY_N = Number(mn.dataset.mn); $('listBody').querySelectorAll('[data-mn]').forEach(x => x.setAttribute('aria-pressed', String(x === mn))); return; }
       const b = e.target.closest('[data-m2]'); if(!b) return;
       if(b.dataset.m2 === 'survival') return startSurvival();
       const m = MODES2.find(x => x.id === b.dataset.m2);
       startGame(Object.assign({opp:pool[Math.floor(Math.random() * pool.length)]}, m.cfg()));
     };
   }
-  const MODE_NAME = {story:'ストーリー', free:'フリービンゴ', tournament:'トーナメント', challenge:'チャレンジ', boss:'ボスビンゴ', mystery:'ミステリー', endless:'エンドレス', survival:'サバイバル', double:'ダブル'};
+  const MODE_NAME = {story:'ストーリー', free:'フリービンゴ', tournament:'トーナメント', challenge:'チャレンジ', boss:'ボスビンゴ', mystery:'ミステリー', endless:'エンドレス', survival:'サバイバル', double:'ダブル', many:'おおぜい', rank:'リーグ戦', pic:'絵柄'};
   function openStats(){
     listHead('戦績・記録');
     const st = save.stats, lose = st.played - st.wins;
     const chars = Object.keys(CHAR).filter(id => isOwned(id)).map(id => {
       const c = csOf(id);
-      return `<div class="row"><span>${CHAR[id].name}　Lv${lvOf(id)}</span><b>${c.played}戦 ${c.win}勝 ${c.lose}敗　ビンゴ${c.bingo}</b></div>`;
+      return `<div class="row"><span>${portrait(id,'').replace('<img','<img style="width:34px;height:40px;object-fit:contain;vertical-align:middle"')} ${CHAR[id].name}　Lv${lvOf(id)}</span><b>${c.played}戦 ${c.win}勝 ${c.lose}敗　ビンゴ${c.bingo}</b></div>`;
     }).join('');
     const modes = Object.keys(MODE_NAME).map(m => {
       const x = save.modeStat[m] || {played:0, win:0};
       return `<div class="row"><span>${MODE_NAME[m]}</span><b>${x.played}戦 ${x.win}勝</b></div>`;
     }).join('');
     $('listBody').innerHTML = `<div class="panel"><h2>ぜんたい</h2>
-      <div class="row"><span>総プレイ回数</span><b>${st.played}</b></div>
-      <div class="row"><span>総勝利数</span><b>${st.wins}</b></div>
-      <div class="row"><span>総敗北数</span><b>${lose}</b></div>
-      <div class="row"><span>総ビンゴ成立数</span><b>${st.bingos}</b></div>
-      <div class="row"><span>最高獲得スコア</span><b>${save.st.topScore}</b></div>
-      <div class="row"><span>最長連勝数</span><b>${save.st.maxStreak}（いま ${save.st.streak}）</b></div>
+      <div class="tiles">
+        <div class="tile"><b>${st.played}</b><small>総プレイ</small></div><div class="tile"><b>${st.wins}</b><small>勝ち</small></div>
+        <div class="tile"><b>${lose}</b><small>負け</small></div><div class="tile"><b>${st.bingos}</b><small>ビンゴ</small></div>
+        <div class="tile"><b>${save.st.topScore}</b><small>最高スコア</small></div><div class="tile"><b>${save.st.maxStreak}</b><small>最長連勝（いま${save.st.streak}）</small></div></div>
       <div class="row"><span>ログイン</span><b>${save.login.streak}日連続／合計${save.login.total}日</b></div>
       <h2>キャラ別</h2>${chars}<h2>モード別</h2>${modes}</div>`;
     $('listBody').onclick = null;
@@ -1533,11 +1415,10 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     const y = new Date(Date.now() - 864e5), ys = `${y.getFullYear()}-${y.getMonth() + 1}-${y.getDate()}`;
     save.login.streak = save.login.last === ys ? save.login.streak + 1 : 1;
     save.login.last = today; save.login.total++;
-    const R = [{c:50},{c:60},{c:80,t:1},{c:80},{c:100,i:1},{c:120},{c:250,t:2}];
+    const R = [{c:50},{c:60},{c:80,t:1},{c:80},{c:150},{c:120},{c:250,t:2}];
     const d = (save.login.streak - 1) % 7, r = R[d];
     save.coins += r.c; let txt = `${r.c}コイン`;
     if(r.t){ tkUpdate(); save.tk.n += r.t; txt += `＋チケット${r.t}枚`; }
-    if(r.i){ const k = randomKey(); save.items[k] = (save.items[k] || 0) + 1; save.seen.items[k] = 1; txt += `＋${ITEMS[k].name}`; }
     writeSave();
     const dots = R.map((_, i) => `<span style="display:inline-block;width:22px;height:22px;border-radius:50%;line-height:22px;font-size:12px;margin:0 2px;background:${i === d ? '#f5a623' : (i < d ? '#9bd18b' : '#e6dccb')}">${i + 1}</span>`).join('');
     const ov = document.createElement('div');
@@ -1555,7 +1436,6 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
       {id:'c_win30', name:'合計30回かつ', v:s => s.stats.wins, n:30, coin:300},
       {id:'c_line20', name:'ビンゴを合計20本', v:s => s.stats.bingos, n:20, coin:120},
       {id:'c_line100', name:'ビンゴを合計100本', v:s => s.stats.bingos, n:100, coin:400},
-      {id:'c_item30', name:'アイテムを30回つかう', v:s => s.st.used, n:30, coin:120},
       {id:'c_streak5', name:'5連勝する', v:s => s.st.maxStreak, n:5, coin:200}
     ];
     Object.keys(CHAR).forEach(id => {
@@ -1567,13 +1447,14 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
   function cumHTML(){
     const rows = cumList().map(m => {
       const locked = m.ch && !isOwned(m.ch), cur = Math.min(m.n, locked ? 0 : m.v(save)), done = cur >= m.n, got = save.cum.claimed.includes(m.id);
-      return `<div class="row"><span>${locked ? '？？？（仲間にすると解放）' : m.name}<br><small>${cur} / ${m.n}　報酬 ${m.coin}コイン</small></span>
+      return `<div class="row"><span>${locked ? '？？？（仲間にすると解放）' : m.name}<br><small>${cur} / ${m.n}　報酬 ${m.coin}コイン</small><div class="bar"><i style="width:${Math.round(cur / m.n * 100)}%"></i></div></span>
         <button class="btn small" data-cclaim="${m.id}" ${done && !got && !locked ? '' : 'disabled'}>${got ? '受取済' : (done ? '受け取る' : '進行中')}</button></div>`;
     }).join('');
     return `<div class="panel" style="margin-top:12px"><h2>累計・キャラ別ミッション</h2>${rows}</div>`;
   }
   function finish(){
     if(!G || G.over) return;
+    G.decl = null; $('declBtn').classList.add('hidden');
     G.over = true; stopTimer();
     const P = G.player, N = G.npc;
     const ps = score(P), ns = score(N);
@@ -1586,7 +1467,7 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
 
     let coins = 30 + Math.floor(Math.max(0, ps) / 10) + lines * 5 + (win ? 60 : 0);
     if(G.boss && win) coins += 300;
-    coins += (G.coinGain || 0) + Math.max(0, P.cards.length - 1) * 15;
+    coins += (G.coinGain || 0) + (G.cfg.many ? 0 : Math.max(0, P.cards.length - 1) * 15);
     if(G.mode === 'tournament' && win) coins += 100;
     if(G.mode === 'survival' && win && SV) coins += 40 * SV.round;
     coins = Math.round(coins * (1 + 0.03 * (lvOf(P.char) - 1)));
@@ -1638,11 +1519,10 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     checkTitles();
   }
   function goTitle(){
-    stopTimer();
+    stopTimer(); $('declBtn').classList.add('hidden');
     if(G && !G.over && G.mode === 'tournament') T = null;
     SV = null;
     G = null;
-    cancelTarget(true);
     $('result').classList.add('hidden');
     go('title');
   }
@@ -1662,13 +1542,12 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
   $('dbgOk').addEventListener('click', dbgSubmit);
   $('dbgIn').addEventListener('keydown', e => { if(e.key === 'Enter') dbgSubmit(); });
   $('dbgNo').addEventListener('click', () => $('dbgPad').classList.add('hidden'));
-  $('dbgMeter').addEventListener('click', () => { if(G && !G.over){ G.meter = METER_MAX; renderAll(); } });
   let dbgWipeArm = false;
   function openDebug(){
     listHead('デバッグ');
     const b = (k, t) => `<button class="btn small sub" data-dbg="${k}" style="margin:4px">${t}</button>`;
     $('listBody').innerHTML = `<div class="panel"><p class="nothing">デバッグ中：対戦でチケットを消費しないよ。</p>
-      ${b('coins','コイン +9999')}${b('tk','チケット満タン')}${b('items','全アイテム 9個')}${b('chars','全キャラ解放')}
+      ${b('coins','コイン +9999')}${b('tk','チケット満タン')}${b('chars','全キャラ解放')}
       ${b('cos','ダウバー・フレーム・カード柄 全解放')}${b('story','ストーリー・チャレンジ全クリア')}${b('boss','ボスビンゴ解放')}
       ${b('daily','ミッション全達成')}${b('titles','称号を全部獲得')}${b('wipe', dbgWipeArm ? '本当に初期化する？（もう一度）' : 'セーブ初期化')}${b('off','デバッグを終了')}</div>`;
     $('listBody').onclick = e => {
@@ -1676,7 +1555,6 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
       const k = x.dataset.dbg; let msg = 'OK';
       if(k === 'coins') save.coins += 9999;
       else if(k === 'tk'){ save.tk.n = TK_MAX; save.tk.t = Date.now(); }
-      else if(k === 'items') ITEM_KEYS.forEach(i => save.items[i] = 9);
       else if(k === 'chars') Object.keys(CHAR).forEach(i => { if(!save.owned.includes(i)) save.owned.push(i); });
       else if(k === 'cos'){ DAUBERS.forEach(d => { if(!save.daub.owned.includes(d.id)) save.daub.owned.push(d.id); }); FRAMES.forEach(f => { if(!save.frame.owned.includes(f.id)) save.frame.owned.push(f.id); }); CARDSKINS.forEach(c => { if(!save.cskin.owned.includes(c.id)) save.cskin.owned.push(c.id); }); }
       else if(k === 'story'){ STORY.forEach(x2 => { save.story[x2.id] = true; unlock(x2.id); }); CHALLENGES.forEach(c => save.challenge[c.id] = true); }
@@ -1715,6 +1593,8 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
       const n = r*15 + i + 1;
       return `<div class="pc ${set.has(n) ? 'on' : ''} ${n === last ? 'last' : ''}">${n}</div>`;
     }).join('')).join('');
+    $('bigLetter').textContent = $('pLetter').textContent; $('bigNum').textContent = $('pNum').textContent; $('bigCount').textContent = `${PS.drawn.length} / 75`;
+    $('bigRecent').textContent = PS.drawn.length > 1 ? 'まえ：' + PS.drawn.slice(-7, -1).reverse().join('　') : '';
     $('paperRecent').textContent = PS.drawn.length ? '最近：' + PS.drawn.slice(-6).reverse().map(n => `${LET[Math.floor((n-1)/15)]}${n}`).join('　') : '';
   }
   function paperDraw(){
@@ -1725,12 +1605,13 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     let k = 0;
     const roll = setInterval(() => {
       $('pNum').textContent = 1 + Math.floor(Math.random()*75); $('pLetter').textContent = LET[Math.floor(Math.random()*5)];
+      $('bigNum').textContent = $('pNum').textContent; $('bigLetter').textContent = $('pLetter').textContent;
       if(k % 2 === 0) sfx('tick');
       if(++k >= 8){
         clearInterval(roll); ball.classList.remove('rolling');
         const n = PS.deck.pop(); PS.drawn.push(n);
         const l = LET[Math.floor((n-1)/15)], c = PS.drawn.length;
-        say(`${READ_LETTER[l]}の${jaNum(n)}`, `${l}, ${enNum(n)}`);
+        say(bonCall(n, save.sel), `${l}, ${enNum(n)}`);
         sfx('mark');
         let line = [`${l}の ${n}！`, `${l}の ${n} だよ〜`, `次いくよ！ ${l}の ${n}！`, `${l}の ${n}、あったかな？`][Math.floor(Math.random()*4)];
         if(c === 1) line = `はじまるよ！ 最初は ${l}の ${n}！`;
@@ -1763,6 +1644,12 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     const b = $('banner'); b.textContent = 'ビンゴ！'; b.classList.remove('show'); void b.offsetWidth; b.classList.add('show');
     setTimeout(() => b.classList.remove('show'), 1200);
   });
+  let wakeLock = null;
+  async function wakeOn(){ try { if(navigator.wakeLock) wakeLock = await navigator.wakeLock.request('screen'); } catch(e){} }
+  function wakeOff(){ try { if(wakeLock) wakeLock.release(); } catch(e){} wakeLock = null; }
+  $('paperBigBtn').addEventListener('click', () => { $('paperBig').classList.remove('hidden'); renderPaper(); wakeOn(); });
+  $('bigClose').addEventListener('click', () => { $('paperBig').classList.add('hidden'); wakeOff(); });
+  $('bigNext').addEventListener('click', () => { if(PS.auto) return; paperDraw(); });
   $('paperReset').addEventListener('click', () => {
     if(!PS.resetArm){ PS.resetArm = true; $('paperReset').textContent = 'もう一度おすとリセット'; setTimeout(() => { PS.resetArm = false; $('paperReset').textContent = 'リセット'; }, 3000); return; }
     PS.resetArm = false; $('paperReset').textContent = 'リセット'; paperReset();
@@ -1771,7 +1658,6 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
   /* ===== 用語と遊び方 ===== */
   function openHowto(){
     listHead('用語と遊び方');
-    const items = Object.keys(ITEMS).map(k => `<li><b>${ITEMS[k].name}</b>：${ITEMS[k].desc}</li>`).join('');
     const chars = Object.keys(CHAR).map(k => `<li><b>${CHAR[k].name}</b>：${CHAR[k].skill}</li>`).join('');
     $('listBody').innerHTML = `<div class="panel howto">
       <h2>遊び方</h2><ol>
@@ -1779,7 +1665,6 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
         <li>出た数字がカードにあったら、そのマスをタップして穴を開ける（光ってるマスが目印）。</li>
         <li>たて・よこ・ななめ5マスそろえるとビンゴ！ 早いほど高得点。</li>
         <li>規定ターンが終わったときの、ビンゴの数が多いほうが勝ち。同じならリーチの数、それも同じならポイントで決まる。</li>
-        <li>マスを3つ開けるとパワーメーターが満タン。たまるとアイテムを1個使える（使った分だけ手持ちから減って、メーターも減る。5回満タンにするたび無料アイテム）。</li>
         <li>オートをONにすると、穴を勝手に開けてくれる。</li>
       </ol>
       <h2>用語</h2><ul>
@@ -1787,20 +1672,17 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
         <li><b>ターン</b>：数字が1つ出る1回分。</li>
         <li><b>ポイント</b>：勝敗を決める点数。ビンゴや金マスで増える。</li>
         <li><b>ラッキーナンバー</b>：対戦ごとに1つ決まる数字（画面上部）。そのマスを開けると+50pt。</li>
-        <li><b>宝箱マス🎁／コインマス🪙</b>：開けるとアイテム／+20コイン。ラッキーは🍀。</li>
-        <li><b>レア</b>：★のアイテムはメーターが5必要。ふつうは3。</li>
+        <li><b>宝箱マス🎁／コインマス🪙</b>：開けると+30コイン／+20コイン。ラッキーは🍀。</li>
         <li><b>カード柄</b>：ガチャで集めて、コレクションで選べる。</li>
-        <li><b>パワーメーター</b>：マスを3つ開けると満タン。アイテムを使うと空になる。</li>
         <li><b>オート／マニュアル</b>：穴を自動で開ける／自分でタップして開ける。</li>
-        <li><b>コイン</b>：アイテム・ガチャの購入に使う。</li>
-        <li><b>チケット</b>：対戦に入るときに使う。10分に1枚たまる（最大5枚）。</li>
+        <li><b>コイン</b>：ガチャに使う。</li>
+        <li><b>チケット</b>：対戦に入るときに使う。5分に1枚たまる（最大10枚）。</li>
         <li><b>ダウバー</b>：穴を塗る色。ボンの色で選べる。</li>
         <li><b>フレーム</b>：立ち絵の枠のデザイン。</li>
         <li><b>デイリーミッション</b>：毎日変わるお題。達成でコイン。</li>
         <li><b>称号</b>：実績の達成でもらえる。タイトルに表示できる。</li>
         <li><b>ボーナスラウンド</b>：勝つと箱を1つ選べる。</li>
       </ul>
-      <h2>アイテム</h2><ul>${items}</ul>
       <h2>ボンのスキル</h2><ul>${chars}</ul></div>`;
     $('listBody').onclick = null;
   }
@@ -1828,7 +1710,7 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     const ms = dayMissions();
     const rows = ms.map(m => {
       const cur = Math.min(m.n, save.daily.prog[m.key] || 0), done = cur >= m.n, got = save.daily.claimed.includes(m.id);
-      return `<div class="row"><span>${m.name}<br><small>${cur} / ${m.n}　報酬 ${m.coin}コイン</small></span>
+      return `<div class="row"><span>${m.name}<br><small>${cur} / ${m.n}　報酬 ${m.coin}コイン</small><div class="bar"><i style="width:${Math.round(cur / m.n * 100)}%"></i></div></span>
         <button class="btn small" data-claim="${m.id}" ${done && !got ? '' : 'disabled'}>${got ? '受取済' : (done ? '受け取る' : '進行中')}</button></div>`;
     }).join('');
     const all = ms.every(m => save.daily.claimed.includes(m.id));
@@ -1855,13 +1737,14 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     {id:'a1', name:'はじめてのビンゴ', desc:'初めてビンゴを成立させる', ok:s => s.stats.bingos >= 1},
     {id:'a2', name:'3れんしょう', desc:'3連勝する', ok:s => s.st.maxStreak >= 3},
     {id:'a3', name:'ダブルのよろこび', desc:'1ゲームでビンゴを2本以上そろえる', ok:s => s.st.multi >= 1},
-    {id:'a4', name:'アイテムつかい', desc:'アイテムを20回つかう', ok:s => s.st.used >= 20},
     {id:'a5', name:'ハイスコア', desc:'1ゲームで300点以上とる', ok:s => s.st.topScore >= 300},
     {id:'a6', name:'ログイン7日', desc:'7日連続でログイン', ok:s => s.login.streak >= 7},
     {id:'a7', name:'せいちょう', desc:'どれかのボンをLv5にする', ok:s => Object.keys(CHAR).some(id => lvOf(id) >= 5)},
     {id:'a8', name:'ぜんぶのモード', desc:'すべてのゲームモードを遊ぶ（ストーリー・トーナメント・チャレンジ・ボスを含む全クリア）', ok:s => STORY.every(x => s.story[x.id]) && s.tournClear >= 1 && CHALLENGES.every(c => s.challenge[c.id]) && s.bossDone && ['mystery','endless','survival','double'].every(m => (s.rec[m] || {}).played >= 1)}
   );
   Object.keys(CHAR).forEach(id => TITLES.push({id:'w_' + id, name:`${CHAR[id].name}マスター`, desc:`${CHAR[id].name}で勝利する`, ok:s => ((s.cs[id] || {}).win || 0) >= 1}));
+  TITLES.push({id:'r1', name:'ゴールドランカー', desc:'リーグ戦でゴールドに到達', ok:s => s.rank.pt >= 250}, {id:'r2', name:'ボンマスター', desc:'リーグ戦でボンマスターに到達', ok:s => s.rank.pt >= 1000});
+  TITLES.push({id:'b1', name:'ボンの親友', desc:'どれかのボンとなかよし♥5になる', ok:s => Object.keys(s.bond || {}).some(id => ((s.bond[id] || {}).xp || 0) >= 150)});
   function checkTitles(){
     TITLES.forEach(t => {
       if(!save.titles.got.includes(t.id) && t.ok(save)){
@@ -1905,19 +1788,10 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
     $('shopCoins').textContent = `コイン ${save.coins}`;
     const gacha = `<div class="gacha"><div><b>ダウバー・アバターガチャ</b><br><small>マーカー・フレーム・カード柄がランダムで出る（だぶりは${GACHA_DUP_COINS}コインに）</small></div>
       <button class="btn small" data-gacha="1" ${save.coins < GACHA_COST ? 'disabled' : ''}>${GACHA_COST}コイン</button></div>`;
-    const rows = gacha + ITEM_KEYS.map(k => {
-      const d = ITEMS[k], owned = save.items[k] || 0;
-      return `<div class="shopitem"><div class="info"><b>${d.name}</b> <small>${d.cat}</small><br><small>${d.desc}</small></div>
-        <div style="text-align:right"><div>所持 ${owned}</div><button class="btn small" data-buy="${k}" ${owned>=9||save.coins<d.price?'disabled':''}>${d.price}コイン</button></div></div>`;
-    }).join('');
+    const rows = gacha;
     $('shopBody').innerHTML = rows;
     $('shopBody').onclick = e => {
       if(e.target.closest('[data-gacha]')) return doGacha();
-      const b = e.target.closest('[data-buy]'); if(!b) return;
-      const k = b.dataset.buy, d = ITEMS[k];
-      if(save.coins < d.price || (save.items[k]||0) >= 9) return;
-      save.coins -= d.price; save.items[k] = (save.items[k]||0) + 1; save.seen.items[k] = 1; writeSave();
-      sfx('item'); renderShop();
     };
   }
   function doGacha(){
@@ -1941,10 +1815,8 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
   function renderColl(){
     const chars = Object.keys(CHAR).map(id => `<div class="prow">${portrait(id,'').replace('<img','<img style="width:70px;height:80px;object-fit:contain;' + (isOwned(id) ? '' : 'filter:brightness(0);opacity:.45') + '"')}
       <div class="info"><b>${isOwned(id) ? CHAR[id].name : '？？？'}<span class="tag ${isOwned(id)?'ok':'lock'}">${isOwned(id)?'Lv' + lvOf(id):'未発見'}</span></b><small>${isOwned(id) ? CHAR[id].skill : '取得条件：ストーリーで対戦相手に勝つ'}</small></div></div>`).join('');
-    const itemRows = ITEM_KEYS.map(k => { const d = ITEMS[k], sn = save.seen.items[k] || save.items[k] > 0;
-      return `<div class="row"><span>${sn ? d.name : '？？？'}<br><small>${sn ? d.desc : '取得条件：ショップで買う／ビンゴ報酬などで手に入れる'}</small></span><b>${sn ? '発見' : '未発見'}</b></div>`; }).join('');
     const titleRows = TITLES.map(t => { const g = save.titles.got.includes(t.id);
-      return `<div class="row"><span>${g ? t.name : '？？？'}<br><small>取得条件：${t.desc}</small></span><b>${g ? '獲得' : '未獲得'}</b></div>`; }).join('');
+      return `<div class="row${g ? '' : ' locked'}"><span>${g ? t.name : '？？？'}<br><small>取得条件：${t.desc}</small></span><b>${g ? '獲得' : '未獲得'}</b></div>`; }).join('');
     const storyDone = STORY.filter(x => save.story[x.id]).length;
     const chDone = CHALLENGES.filter(c => save.challenge[c.id]).length;
     const daubs = DAUBERS.map(d => {
@@ -1963,7 +1835,6 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
       <div class="panel" style="margin-top:12px"><h2>ダウバー（マーカー）</h2><div class="opts-wrap">${daubs}</div>
       <h2>フレーム（立ち絵の枠）</h2><div class="opts-wrap">${frames}</div>
       <h2>カード柄</h2><div class="opts-wrap">${cskins}</div></div>
-      <div class="panel" style="margin-top:12px"><h2>アイテム図鑑（${ITEM_KEYS.filter(k => save.seen.items[k] || save.items[k] > 0).length} / ${ITEM_KEYS.length}）</h2>${itemRows}</div>
       <div class="panel" style="margin-top:12px"><h2>称号・実績コレクション（${save.titles.got.length} / ${TITLES.length}）</h2>${titleRows}</div>
       <div class="panel" style="margin-top:12px">
         <div class="row"><span>ストーリー</span><b>${storyDone} / ${STORY.length}</b></div>
@@ -1989,6 +1860,7 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
   writeSave();
   renderTitle();
   go('title');
+  applyAnim();
   loginBonus();
 })();
 </script>
