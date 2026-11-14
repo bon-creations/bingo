@@ -96,6 +96,7 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
 .cell.open{background:var(--yellow)}
 .cell.open::after{content:"";position:absolute;inset:14%;border-radius:50%;background:rgba(255,122,162,.5)}
 .cell.gold{box-shadow:inset 0 0 0 2px #e0a000;background:#fff3c2}
+.peek{background:#fff;border:3px solid #3f7be0;color:#2a5fc0;border-radius:20px;padding:3px 12px;font-weight:900;font-size:.82rem;margin:0 auto 4px;text-align:center}
 .cell.hint{animation:hintpulse 1s infinite;box-shadow:0 0 0 3px #3f7be0}
 @keyframes hintpulse{50%{box-shadow:0 0 0 6px #9fc5ff}}
 .cell.flash{animation:flash .6s}
@@ -372,7 +373,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
         <div class="bub hidden" id="pBub"></div>
       </div>
       <div>
-        <div class="ball" id="ballEl"><span class="letter" id="ballLetter">?</span><span class="num" id="ballNum">-</span></div>
+        <div class="peek hidden" id="peekEl"></div><div class="ball" id="ballEl"><span class="letter" id="ballLetter">?</span><span class="num" id="ballNum">-</span></div>
       </div>
       <div class="side npc">
         <div id="nPort" class="portrait-sm" style="margin:0 auto"></div>
@@ -463,12 +464,12 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
   const CHAR = {
     oko:  {name:'おこボン',  color:'#d63a2f', skill:'ゴールデンマークの効果が2倍', start:true},
     nico: {name:'にこボン',  color:'#e0b019', skill:'ビンゴが成立するたび ボーナス+10pt', start:true},
-    hyoe: {name:'ひょえボン',color:'#3f7be0', skill:'ピンチのマスをヒントで光らせる', start:true},
+    hyoe: {name:'ひょえボン',color:'#3f7be0', skill:'ときどき 次に出る数字を 先読みできる', start:true},
     mogu: {name:'もぐボン',  color:'#3fa764', skill:'ビンゴが成立するたび コインがもらえる（+15）'},
-    nemu: {name:'ねむボン',  color:'#8b5cc4', skill:'最初の8ターンは あいてのマスが開きにくい'},
+    nemu: {name:'ねむボン',  color:'#8b5cc4', skill:'最初の8ターンは あいてのマスが開きにくい（逆ビンゴでは 開きやすくなる）'},
     tere: {name:'てれボン',  color:'#ee7fa8', skill:'ラッキーナンバーのボーナスが2倍'},
     sakusha:{name:'さくしゃボン', color:'#6b7a3a', skill:'ビンゴ宣言ボーナスが2倍', start:true},
-    niji: {name:'にじボン',  color:'#9b7bd9', skill:'毎ターン、ランダムな特殊効果が出ることも'}
+    niji: {name:'にじボン',  color:'#9b7bd9', skill:'毎ターン、ランダムな特殊効果が出ることも（逆ビンゴでは あいてに出る）'}
   };
   const DIFF = {
     easy:   {name:'やさしい', prob:0.6,  act:0.25, items:2},
@@ -567,7 +568,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     sakusha:{win:'やったね！ いい勝負だった', lose:'むむ…次は負けないぞ', bingo:'ビンゴ！ いいね！'}
   };
   const LVUP_PLACE = 0;
-  const LVUP = {oko:'ゴールド+5pt／Lv', nico:'ボーナス+2pt／Lv', hyoe:'Lv6でヒント範囲が広がる', mogu:'コイン+2／Lv', nemu:'3Lvごとに効果ターン+1', tere:'ボーナス+5pt／Lv', niji:'発動率+2%／Lv', sakusha:'（コインのみ）'};
+  const LVUP = {oko:'ゴールド+5pt／Lv', nico:'ボーナス+2pt／Lv', hyoe:'Lvが上がるほど 先読みが当たりやすい', mogu:'コイン+2／Lv', nemu:'3Lvごとに効果ターン+1', tere:'ボーナス+5pt／Lv', niji:'発動率+2%／Lv', sakusha:'（コインのみ）'};
 
   const PICORDER = ['oko','nico','hyoe','mogu','nemu','tere','niji','sakusha'];
   const vLabel = v => (G && G.cfg && G.cfg.pic) ? CHAR[PICORDER[(v - 1) % 15]].name.replace('ボン', '') : v;
@@ -1213,13 +1214,15 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
 
     const n = nextNumber();
     G.turn++; G.drawn.push(n);
+    G.peek = (P.char === 'hyoe' && G.deck.length && Math.random() < Math.min(0.9, 0.4 + 0.05 * (lvOf('hyoe') - 1))) ? G.deck[G.deck.length - 1] : null;
     const dbl = 1, pmult = 1, nmult = 1;
 
     const flash = new Set();
     const goldP = (P.char === 'oko' ? 100 + 5 * (lvOf('oko') - 1) : 50) * dbl;
     if(G.cfg.rev && G.shield){ G.shield = false; msg('シールドで 数字をさけた！'); sfx('tick'); }
     else if(G.cfg.many || G.cfg.rev || (save.sett.auto && !G.cfg.duo)){ P.cards.forEach((card, ci) => markCard(card, n, 1, 'p'+ci, flash, goldP)); }
-    const nprob = N.prob * (P.char === 'nemu' && G.turn <= 8 + Math.floor((lvOf('nemu') - 1) / 3) ? 0.4 : 1);
+    const nemuOn = P.char === 'nemu' && G.turn <= 8 + Math.floor((lvOf('nemu') - 1) / 3);
+    const nprob = G.cfg.rev ? Math.min(1, N.prob * (nemuOn ? 1.8 : 1)) : N.prob * (nemuOn ? 0.4 : 1);   // 逆ビンゴでは あいてが開きやすくなる（ビンゴが増えるほうが有利）
     N.cards.forEach((card, ci) => markCard(card, n, nprob, 'n'+ci, flash, 50));
     if(G.boss && G.turn % 10 === 0){
       const cs = []; N.cards.forEach(card => { for(let r = 0; r < 5; r++) for(let c = 0; c < 5; c++) if(!card.open[r][c] && card.nums[r][c] && G.drawn.includes(card.nums[r][c])) cs.push([card, r, c]); });
@@ -1280,8 +1283,10 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
 
   function randomSkill(isP){
     if(Math.random() > 0.25 + (isP && G.player.char === 'niji' ? 0.02 * (lvOf('niji') - 1) : 0)) return;
-    const side = isP ? G.player : G.npc;
-    const who = isP ? 'あなた' : G.npc.name;
+    const rv = !!(G.cfg && G.cfg.rev);   // 逆ビンゴでは 効果が「あいて側」に向かう
+    const tgt = rv ? !isP : isP;
+    const side = tgt ? G.player : G.npc;
+    const who = tgt ? 'あなた' : G.npc.name;
     const r = Math.random();
     if(r < 0.4){
       side.adj += 10; msg(`にじボンの ちから！ ${who} +10pt`);
@@ -1291,13 +1296,13 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
       cards.forEach((card,ci) => { for(let rr=0;rr<5;rr++) for(let cc=0;cc<5;cc++) if(!card.open[rr][cc] && card.nums[rr][cc]) cands.push([ci,rr,cc]); });
       if(!cands.length) return;
       const [ci,rr,cc] = cands[Math.floor(Math.random()*cands.length)];
-      const lines = openCell(cards[ci], rr, cc, isP);
+      const lines = openCell(cards[ci], rr, cc, tgt);
       msg(`にじボンの ちから！ ${who}のマスが開いた`);
-      if(lines && isP) afterPlayerLines(lines);
+      if(lines && tgt) afterPlayerLines(lines);
       else if(lines) msg(`${G.npc.name}がビンゴ！`);
     } else {
-      if(isP) G.coinGain = (G.coinGain || 0) + 30; else side.adj += 10;
-      msg(`にじボンの ちから！ ${isP ? 'コイン+30' : who + ' +10pt'}`);
+      if(isP) G.coinGain = (G.coinGain || 0) + 30; else if(!rv) side.adj += 10;
+      msg(`にじボンの ちから！ ${isP ? 'コイン+30' : (rv ? '（なにも起きない）' : who + ' +10pt')}`);
     }
   }
 
@@ -1311,7 +1316,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
 
   function computeHints(){
     G.hints = new Set();
-    if(G.player.char !== 'hyoe') return;
+    return;   // ひょえボンのスキルは「次の数字の先読み」に変更（peek）
     G.player.cards.forEach((card,ci) => {
       LINES.forEach((ln,i) => {
         if(card.done.has(i)) return;
@@ -1322,6 +1327,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
   }
 
   function renderAll(){
+    { const pk = $('peekEl'); if(pk){ const on = !!(G && G.peek && !G.over && G.player.char === 'hyoe'); pk.classList.toggle('hidden', !on); if(on) pk.textContent = G.cfg.pic ? `ひょえ…！ 次は ${LET[Math.floor((G.peek - 1) / 15)]}の${CHAR[PICORDER[(G.peek - 1) % 15]].name} かも…` : `ひょえ…！ 次は ${LET[Math.floor((G.peek - 1) / 15)]}の${G.peek} かも…`; } }
     $('autoBtn').setAttribute('aria-pressed', String(G && G.cfg && G.cfg.duo ? false : (!!save.sett.auto || !!(G && G.cfg && (G.cfg.many || G.cfg.rev)))));
     if(G && G.cfg){ $('shieldBtn').classList.toggle('hidden', !G.cfg.rev); if(G.cfg.rev) $('shieldBtn').textContent = G.shield ? 'シールド構え中！' : `シールド×${G.shields}`; }
     if(!G) return;
@@ -1750,7 +1756,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     const lines = lineCount(P.cards);
     const pl = lineCount(P.cards), nl = lineCount(N.cards), pr = reachCount(P.cards), nr = reachCount(N.cards);
     let cmp = pl !== nl ? pl - nl : (pr !== nr ? pr - nr : ps - ns);   // ビンゴ数 → リーチ数 → ポイント の順で決める
-    if(G.mode === 'rev') cmp = -cmp;
+    if(G.mode === 'rev') cmp = pl !== nl ? nl - pl : (pr !== nr ? nr - pr : 0);   // 逆ビンゴはポイントは見ない（スキルで有利不利が出ないように）
     let win = cmp > 0;
     if(G.challenge) win = G.challenge.check(G);
     if(G.mode === 'double') win = pl >= 4;
