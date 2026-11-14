@@ -131,6 +131,15 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
 body.bigtxt .cell{font-size:clamp(.95rem,4.4vw,1.3rem)}body.bigtxt .hud,body.bigtxt .opt,body.bigtxt .btn{font-size:1.05em}
 body.bigtxt .cards.many .cell{font-size:.7rem}
 .cell,.opt,.btn{touch-action:manipulation}
+.btn.hot{background:linear-gradient(135deg,#ffd54a,#ff9a3c);color:#3b2d4a;box-shadow:0 5px 0 #d98a1f;border:2px solid #fff;font-size:1.05rem;position:relative}
+.btn.hot small{display:block;font-size:.7rem;font-weight:700;opacity:.85}
+.btn.hot .rec,.prow.rec .badge{background:#ff5d8f;color:#fff;border-radius:999px;padding:1px 8px;font-size:.68rem;margin-right:4px;vertical-align:middle}
+.prow.rec{background:#fff6d6;border:2px solid #ffd54a;border-radius:16px}
+.petheart{position:absolute;pointer-events:none;font-size:1.6rem;animation:pheart 1s ease-out forwards}
+@keyframes pheart{0%{opacity:1;transform:translateY(0) scale(.8)}100%{opacity:0;transform:translateY(-90px) scale(1.4)}}
+#petImg img{height:220px;filter:drop-shadow(0 4px 0 rgba(0,0,0,.2))}
+.diary{background:#fffaf0;border:2px dashed #e6c98a;border-radius:12px;padding:8px 10px;margin:8px 0;text-align:left;font-size:.92rem}
+.diary b{display:block;font-size:.8rem;color:#b58a2a}
 .icopick{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
 .icob{border:2px solid #e6d9ee;background:#fff;border-radius:14px;padding:4px 2px;display:flex;flex-direction:column;align-items:center;font-weight:bold}
 .icob img{height:46px;width:auto;max-width:100%;object-fit:contain}.icob small{font-size:.68rem}
@@ -244,6 +253,9 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
 
 <!-- タイトル -->
 <div id="title" class="screen">
+  <div class="topline">
+    <button class="selbox" data-go="char" style="all:unset;cursor:pointer;display:block;margin:0 auto;text-align:center;font-size:.9rem;font-weight:900"><div id="selPortrait" class="portrait-sm"></div><div id="selName"></div><small style="color:#e0457b">▼ タップして じぶんのボンを えらぶ</small></button>
+  </div>
   <h1 aria-label="BON BINGO" class="logo"><svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" role="img">
 <defs>
 <linearGradient id="lgR" x1="0" x2="1"><stop offset="0" stop-color="#ff5d8f"/><stop offset=".25" stop-color="#ffb347"/><stop offset=".5" stop-color="#ffe45c"/><stop offset=".75" stop-color="#5fd38d"/><stop offset="1" stop-color="#5aa9ff"/></linearGradient>
@@ -261,21 +273,21 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
 </svg></h1>
   <p class="tagline">ボンたちと一緒にビンゴで勝負しよう！</p>
   <button class="btn small sub hidden" id="iconHint" data-go="sett" style="margin:0 auto 8px;display:block">📱 ホーム画面に追加する前に、アイコンのボンを選んでね</button>
-  <div class="topline">
-    <div class="selbox"><div id="selPortrait" class="portrait-sm"></div><div id="selName"></div></div>
-  </div>
   <div class="coinline">コイン <span id="coinsTitle">0</span>　／　チケット <span id="tkTitle">0</span>　<small id="tkNext"></small><br><span id="recordTitle"></span></div>
   <div class="panel">
     <div class="menu">
+      <button class="btn" style="grid-column:1/-1" data-go="char">じぶんのボンを えらぶ（キャラクター）</button>
+      <button class="btn hidden" style="grid-column:1/-1" id="btnResume">つづきから</button>
+      <button class="btn hot" id="btnMany" style="grid-column:1/-1"><span class="rec">ボンオリジナル！</span> どっさりビンゴ（20枚）<small>カード20枚をオートでどんどんビンゴ！</small></button>
+      <button class="btn hot" id="btnRev" style="grid-column:1/-1"><span class="rec">ボンオリジナル！</span> 逆ビンゴ<small>ビンゴが「少ない」ほうの勝ち！ シールドでよけろ</small></button>
       <button class="btn" data-go="story">ストーリー</button>
-      <button class="btn hidden" id="btnResume">つづきから</button>
       <button class="btn sub" data-go="free">フリービンゴ</button>
       <button class="btn sub" data-go="tournament">トーナメント</button>
       <button class="btn sub" data-go="challenge">チャレンジ</button>
       <button class="btn sub" data-go="modes">ほかのモード（リーグ戦）</button>
+      <button class="btn sub" data-go="diary">ボンの日記</button>
       <button class="btn sub" data-go="roulette">デイリールーレット</button>
       <button class="btn" data-go="boss" id="btnBoss">ボスビンゴ</button>
-      <button class="btn sub" data-go="char">キャラクター</button>
       <button class="btn sub" data-go="shop">ガチャ</button>
       <button class="btn sub" data-go="paper">紙ビンゴ（司会者）</button>
       <button class="btn sub" data-go="howto">用語と遊び方</button>
@@ -341,6 +353,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
       <button class="opt spd" data-val="fast" aria-pressed="false">はやい</button>
       <button class="opt spd" data-val="turbo" aria-pressed="false">ターボ</button>
       <button class="opt" id="nextBtn">つぎへ▶</button>
+      <button class="opt hidden" id="shieldBtn">シールド×5</button>
       <button class="opt" id="landBtn" aria-pressed="false">横持ち</button>
       <button class="opt" id="autoBtn" aria-pressed="false">オート</button>
       <button class="opt" id="pauseBtn" aria-pressed="false">一時停止</button>
@@ -397,6 +410,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     <p id="resText"></p>
     <div class="nothing" id="resBody"></div>
     <div class="btn-row">
+      <button class="btn sub" id="resShare">シェア画像</button>
       <button class="btn" id="resNext">つぎへ</button>
       <button class="btn sub" id="resRetry">もういちど</button>
       <button class="btn sub" id="resTitleBtn">タイトルへ</button>
@@ -425,6 +439,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
 <div id="flash"></div>
 <canvas id="fx"></canvas>
 <div id="cutin"></div>
+<div id="pet" class="overlay hidden"><div class="panel" style="text-align:center"><h2>ごほうびタイム</h2><p id="petTxt"></p><div id="petImg" style="position:relative;display:inline-block;touch-action:manipulation;user-select:none"></div><div id="petCnt" style="font-weight:900;margin:6px 0"></div><button class="btn" id="petClose">とじる</button></div></div>
 <div id="guide" class="hidden"><div class="gbox"><div class="gdots" id="gDots"></div><h3 id="gTitle"></h3><p id="gText"></p><button class="btn small sub" id="gSkip">スキップ</button> <button class="btn small" id="gNext">つぎへ</button></div></div>
 
 <script>
@@ -548,7 +563,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     nemu:{win:'ふぁ…かった…？ ねむい…', lose:'むにゃ…まけた…zzz', bingo:'ん…ビンゴ…むにゃ'},
     mogu:{win:'かったー！ ごはん食べよ！', lose:'おなかすいた…まけたぁ', bingo:'ビンゴ！ もぐもぐ！'},
     tere:{win:'か、勝っちゃった…えへへ…', lose:'う、うう…はずかしい…', bingo:'び、ビンゴ…！ みないで〜'},
-    niji:{win:'にじいろの かち！', lose:'また にじが かかるさ', bingo:'にじいろビンゴ！'},
+    niji:{win:'我輩の勝ちであるな。実に愉快！', lose:'ふむ……まことに惜しい。されど、次があるのだ。', bingo:'ビンゴであるぞ！ 我輩、お見事！'},
     sakusha:{win:'やったね！ いい勝負だった', lose:'むむ…次は負けないぞ', bingo:'ビンゴ！ いいね！'}
   };
   const LVUP_PLACE = 0;
@@ -557,7 +572,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
   const PICORDER = ['oko','nico','hyoe','mogu','nemu','tere','niji','sakusha'];
   const vLabel = v => (G && G.cfg && G.cfg.pic) ? CHAR[PICORDER[(v - 1) % 15]].name.replace('ボン', '') : v;
   { const st = document.createElement('style'); st.textContent = PICORDER.map((id, i) => `.cell.bz.bzf-${i}{background-image:url("${PIC[id]}")}`).join(''); document.head.appendChild(st); }
-  const BONCALL = {oko:c => `ほらっ、${c}！`, nico:c => `${c}だよ〜！`, hyoe:c => `ひょえっ、${c}…`, mogu:c => `${c}、もぐもぐ`, nemu:c => `ふぁ…${c}…`, tere:c => `え、えっと…${c}…`, niji:c => `にじいろ、${c}！`, sakusha:c => `${c}、いくよ`};
+  const BONCALL = {oko:c => `ほらっ、${c}！`, nico:c => `${c}だよ〜！`, hyoe:c => `ひょえっ、${c}…`, mogu:c => `${c}、もぐもぐ`, nemu:c => `ふぁ…${c}…`, tere:c => `え、えっと…${c}…`, niji:c => `ふむ、${c}であるな`, sakusha:c => `${c}、いくよ`};
   function bonCall(n, who){
     let base = `${READ_LETTER[LET[Math.floor((n - 1) / 15)]]}の${jaNum(n)}`;
     if(G && G.cfg && G.cfg.pic && who === (G.player && G.player.char)) base = `${READ_LETTER[LET[Math.floor((n - 1) / 15)]]}の${CHAR[PICORDER[(n - 1) % 15]].name}`;
@@ -571,13 +586,13 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     nemu:{start:'ふぁ…はじめよ…', reach:'むにゃ…リーチ…', envy:'ん…やるじゃん…'},
     mogu:{start:'もぐもぐ…よろしくっ', reach:'リーチ！ おかわり！', envy:'むぐっ！ のどにつまった！'},
     tere:{start:'よ、よろしくね…えへ', reach:'り、リーチ…ど、どうしよう', envy:'す、すごい…！'},
-    niji:{start:'にじいろに いこう！', reach:'にじが みえてきた！', envy:'きれいな ビンゴだね'},
+    niji:{start:'お主、いざ尋常に勝負であるな！', reach:'リーチであるな。ここからが肝心だぞ', envy:'ほう、お主なかなかやるではないか'},
     sakusha:{start:'いい勝負にしよう！', reach:'リーチだ。ここからだ', envy:'やるね。次は負けない'}
   };
   const SECRET = {
     oko:'ほんとは…お前と遊ぶの、いちばん楽しいんだぜ', nico:'いっしょにいると、ずーっとにこにこできるよ！', hyoe:'こ、こわくない…きみといっしょなら…！',
     nemu:'きみのそばだと…いちばんよく眠れる…', mogu:'とっておきのおやつ、きみにもわけてあげる', tere:'あ、あのね…いつもありがと…',
-    niji:'きみと見る虹は、いつもよりきれいだよ', sakusha:'ボンたちを描いてよかった。いっしょに遊んでくれてありがとう'
+    niji:'お主と遊ぶひとときは、実に良き物語であるな。柿でも食べながら、また語ろうではないか', sakusha:'ボンたちを描いてよかった。いっしょに遊んでくれてありがとう'
   };
   const bubTm = {};
   function bub(w, t, ms){ const el = $(w + 'Bub'); if(!el || !t) return; el.textContent = t; el.classList.remove('hidden'); clearTimeout(bubTm[w]); bubTm[w] = setTimeout(() => el.classList.add('hidden'), ms || 2800); }
@@ -806,6 +821,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     if(mode === 'howto') return openHowto();
     if(mode === 'mission') return openMission();
     if(mode === 'modes') return openModes();
+    if(mode === 'diary') return openDiary();
     if(mode === 'roulette') return openRoulette();
     if(mode === 'stats') return openStats();
     if(mode === 'titles') return openTitles();
@@ -823,7 +839,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
       return `<div class="prow">${portrait(x.id,'') .replace('<img','<img style="width:70px;height:80px;object-fit:contain"')}
         <div class="info"><b>${c.name}<span class="tag ${cleared?'ok':''}">${cleared?'クリア':'未クリア'}</span></b>
         <small>難易度：${DIFF[x.diff].name}　勝つとボンが仲間になる</small></div>
-        <button class="btn small" data-story="${x.id}" data-diff="${x.diff}">たたかう</button></div>`;
+        <button class="btn small" data-story="${x.id}" data-diff="${x.diff}" ${x.id === save.sel ? 'disabled' : ''}>${x.id === save.sel ? 'いまの じぶん' : 'たたかう'}</button></div>`;
     }).join('');
     $('listBody').innerHTML = `<div class="plist">${rows}</div>`;
     $('listBody').onclick = e => {
@@ -855,7 +871,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
       <p class="nothing">最高記録：${save.tournClear}回クリア</p></div>
       <div class="btn-row"><button class="btn" id="tStart">はじめる</button></div>`;
     $('tStart').onclick = () => {
-      const pool = shuffle(['oko','nico','hyoe','mogu','nemu','tere']).slice(0,4);
+      const pool = shuffle(['oko','nico','hyoe','mogu','nemu','tere'].filter(x => x !== save.sel)).slice(0,4);
       const diffs = ['easy','normal','normal','hard'];
       T = {round:1, opps:pool.map((id,i) => ({id, diff:diffs[i]}))};
       startTournamentRound();
@@ -884,7 +900,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     const locked = !STORY.every(x => save.story[x.id]);
     $('listBody').innerHTML = `<div class="panel"><p>${locked ? 'ストーリーを全員クリアすると挑戦できるよ。' : 'ゴールドボンが相手。カード3枚で待ち構えてる！ 10ターンごとに二度行動するよ。'}</p></div>
       <div class="btn-row"><button class="btn" id="bStart" ${locked?'disabled':''}>たたかう</button></div>`;
-    $('bStart').onclick = () => startGame({mode:'boss', boss:true, opp:'oko', diff:'boss', cards:2, npcCards:3, maxTurns:40, speed:'normal', useItems:true});
+    $('bStart').onclick = () => { if(save.sel === 'oko'){ toast('ボスはおこボン！ ほかのボンで挑戦してね'); return; } startGame({mode:'boss', boss:true, opp:'oko', diff:'boss', cards:2, npcCards:3, maxTurns:40, speed:'normal', useItems:true}); };
   }
 
   function openChar(){
@@ -993,6 +1009,10 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     return true;
   }
   function beginGame(cfg, bring, freeEntry){
+    if(cfg.opp === save.sel && !cfg.boss){
+      const alt = ['oko','nico','hyoe','mogu','nemu','tere'].filter(x => x !== save.sel);
+      cfg = Object.assign({}, cfg, {opp:alt[Math.floor(Math.random() * alt.length)]});
+    }
     if(!freeEntry && !save.dbg){ tkUpdate(); save.tk.n--; writeSave(); }
     const deck = shuffle(Array.from({length:75}, (_,i) => i+1).filter(v => !cfg.pic || (v - 1) % 15 < 8));
     const d = DIFF[cfg.diff] || DIFF.normal;
@@ -1007,10 +1027,12 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
       npc:{id:cfg.opp, char:cfg.opp, name:CHAR[cfg.opp].name, prob:d.prob, act:d.act,
         cards:mk(cfg.npcCards || cfg.cards), adj:0}
     };
-    if(cfg.solo){ G.npc.prob = 0; G.npc.act = 0; }
+    if(cfg.solo || cfg.duo){ G.npc.prob = 0; G.npc.act = 0; }
+    if(cfg.rev){ G.shields = 5; G.shield = false; }
     { const nums = G.player.cards[0].nums.flat().filter(v => v > 0); G.lucky = nums[Math.floor(Math.random() * nums.length)]; }
     $('modeText').textContent = modeLabel(cfg);
-    $('npcTitle').textContent = `${CHAR[cfg.opp].name}（NPC）`;
+    $('npcTitle').textContent = cfg.duo ? `2P：${CHAR[cfg.opp].name}` : `${CHAR[cfg.opp].name}（NPC）`;
+    $('pTitle').textContent = cfg.duo ? `1P：${CHAR[G.player.char].name}` : 'あなたのカード';
     $('pauseBtn').textContent = '一時停止';
     $('pauseBtn').setAttribute('aria-pressed', 'false');
     $('result').classList.add('hidden');
@@ -1029,7 +1051,88 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
 
   /* ===== 抽選 ===== */
   function modeLabel(cfg){
-    return {story:'ストーリー', free:'フリービンゴ', tournament:`トーナメント ${T ? T.round : ''}回戦`, challenge:'チャレンジ：' + (cfg.challenge ? cfg.challenge.name : ''), boss:'ボスビンゴ', mystery:'ミステリービンゴ', endless:'エンドレスビンゴ', survival:`サバイバル ${SV ? SV.round : 1}戦目`, double:'ダブルビンゴ（目標：ビンゴ4本）', rank:'リーグ戦（' + RANKS[rankIdx(save.rank.pt)].n + '）', pic:'ボンの絵柄ビンゴ', many:`おおぜいビンゴ（${cfg.cards}枚・オート）`, solo:'ひとりビンゴ（目標：ビンゴ2本）', turbo:'ターボビンゴ'}[cfg.mode] || '';
+    return {story:'ストーリー', free:'フリービンゴ', tournament:`トーナメント ${T ? T.round : ''}回戦`, challenge:'チャレンジ：' + (cfg.challenge ? cfg.challenge.name : ''), boss:'ボスビンゴ', mystery:'ミステリービンゴ', endless:'エンドレスビンゴ', survival:`サバイバル ${SV ? SV.round : 1}戦目`, double:'ダブルビンゴ（目標：ビンゴ4本）', rank:'リーグ戦（' + RANKS[rankIdx(save.rank.pt)].n + '）', pic:'ボンの絵柄ビンゴ', many:`どっさりビンゴ（${cfg.cards}枚・オート）`, solo:'ひとりビンゴ（目標：ビンゴ2本）', turbo:'ターボビンゴ', rev:'逆ビンゴ（少ないほうの勝ち）', duo:'ふたり対戦'}[cfg.mode] || '';
+  }
+  /* ===== 日記・おしゃべり・ごほうび・シェア ===== */
+  const DIARY = {
+    oko:{win:['{opp}に勝ったぜ！ ビンゴ{n}本、アタシの実力ってやつだ！','勝った勝った！ アタシにかかればこんなもんだ。'], lose:['{opp}に負けた……くそっ、悔しい！ 明日こそ勝つ！','悔しいもんは悔しい。次だ次！ アタシは諦めないぞ。'], big:['ビンゴ{n}本！？ アタシ、ちょっと自分がこわい！','今日はビンゴが止まらなかった！ 最高の日だ！']},
+    nico:{win:['{opp}に勝てたよ〜！ ビンゴ{n}本で、にこにこの一日！','かったー！ たのしかったから、もっとにこにこ！'], lose:['まけちゃったけど、たのしかったよ〜。つぎはがんばる！','ざんねん……でも、{opp}といっしょに遊べてうれしかった！'], big:['ビンゴ{n}本もできたよ〜！ すごいでしょ、にこにこ！','きょうはビンゴの日！ うれしくて、ぴょんぴょんしちゃった！']},
+    hyoe:{win:['ひょえ……{opp}に勝っちゃった……。ビンゴ{n}本、ゆめみたい……','かった……！ ひょえ、まだドキドキしてる……'], lose:['ひょえぇ……まけちゃった……。でも、がんばったよね……','やっぱりダメだった……。でも、つぎは……ちょっとだけ、がんばる……'], big:['ビンゴ{n}本！？ ひょえーっ！ ほんとに……！？','ひょえっ！ こんなにビンゴしたの、はじめて……！']},
+    mogu:{win:['{opp}に勝った！ ごはんがおいしい日だ！ ビンゴ{n}本！','かったー！ ごほうびにおやつ、いっぱい食べよ！'], lose:['まけた……おなかすいた……。おやつ食べて元気だそう。','{opp}、つよかった……。でもおやつは おいしかった！'], big:['ビンゴ{n}本！ おなかいっぱい、むねいっぱい！','きょうは大ごちそうの日！ ビンゴ{n}本もできた！']},
+    nemu:{win:['ふぁ……{opp}にかった……。ねむいけど、うれしい……','かった……ビンゴ{n}本……。あとで、ゆっくりねる……'], lose:['むにゃ……まけた……。でも、おひるねしたら、わすれる……','まけちゃった……zzz……つぎは、おきてがんばる……'], big:['ビンゴ{n}本……ねぼけてたのに……すごい……','きょうは、めがさめた……ビンゴ{n}本……ふぁ……']},
+    tere:{win:['か、勝っちゃった……！ {opp}に……！ えへへ……','ビンゴ{n}本……み、みないでほしいくらい、うれしい……'], lose:['ま、まけちゃった……はずかしい……。でも、ちょっとたのしかったかも……','う、うぅ……もっとがんばりたい……。つぎは、ぜったい……！'], big:['ビ、ビンゴ{n}本……！？ ど、どうしよう……うれしすぎて……','き、きょうはすごかった……！ えへへ、ひみつにしておこう……']},
+    niji:{win:['{opp}に勝ったのだ。ビンゴ{n}本、実に愉快であるな。勝利とは、まこと甘きものよ。','我輩の勝ちであるな。されど、おごらず、次なる物語に備えようぞ。'], lose:['{opp}に敗れた……。まことに惜しい。されど、負けもまた物語の一頁であるな。','ふむ、今日は運が味方せなんだ。ゆえに明日こそ、柿でも食べて出直すのだ。'], big:['ビンゴ{n}本！ これぞ、まさに我輩の筆の冴えであるな！','なんと{n}本とは……。実に、まことに、見事な一日であった。']},
+    sakusha:{win:['{opp}との勝負に勝てた。ビンゴ{n}本。いい試合だった。','勝ったよ。みんなと遊ぶのは、やっぱり楽しいな。'], lose:['{opp}に負けた。でも、いい勝負だった。次は負けないぞ。','惜しかったな。こういう日もある。また遊ぼう。'], big:['ビンゴ{n}本！ 今日は調子がよかった。みんなのおかげだね。','ビンゴがたくさん出た日。描いてきた甲斐があるな。']}
+  };
+  const CHATS = {
+    oko:{o:'ねえ、ビンゴって運だけじゃないよな？', r:'運もあるけど、アタシは気合で勝つ！', rf:'おまえとなら、負けても楽しいんだよな。'},
+    nico:{o:'ビンゴ、たのしいね〜！', r:'うん、にこにこしちゃう！', rf:'いっしょに遊ぶと、もっとたのしいよ〜！'},
+    hyoe:{o:'ひょえ……ドキドキしてきた……', r:'だ、だいじょうぶ……たぶん……', rf:'ひょえ……いっしょだと、ちょっと安心……'},
+    mogu:{o:'おなかすいてきたなぁ……', r:'ビンゴのあとは おやつにしよ！', rf:'とっておきのおやつ、わけてあげるよ！'},
+    nemu:{o:'ふぁ……ねむい……', r:'ん……ビンゴのとちゅうで ねちゃいそ……', rf:'ん……いっしょだと、いい夢みれそう……'},
+    tere:{o:'み、みられてると はずかしいな……', r:'え、えへへ……がんばるね……', rf:'あ、あのね……いっしょに遊べて うれしい……'},
+    niji:{o:'ふむ、ビンゴとは奥深いものであるな。', r:'実に、運と読みの物語であるな。', rf:'お主と語らう時間も、また良きものであるな。'},
+    sakusha:{o:'みんな、いい顔で遊んでるね。', r:'そうだね。見ていて楽しいよ。', rf:'こうして遊んでもらえて、うれしいよ。'}
+  };
+  const dstr = () => { const d = new Date(); return `${d.getMonth() + 1}/${d.getDate()}`; };
+  function diaryText(ch, win, n, opp){
+    const set = DIARY[ch] || DIARY.sakusha, arr = (n >= 3 && win) ? set.big : (win ? set.win : set.lose);
+    return arr[Math.floor(Math.random() * arr.length)].replace('{n}', n).replace('{opp}', opp);
+  }
+  function openDiary(){
+    listHead('ボンの日記');
+    const rows = (save.diary || []).map(e => `<div class="prow"><div class="info"><b>${e.d}　${CHAR[e.c] ? CHAR[e.c].name : ''}（${MODE_NAME[e.m] || e.m}・${e.w ? 'かち' : 'まけ'}）</b><small>${e.t}</small></div></div>`).join('');
+    $('listBody').innerHTML = `<div class="plist">${rows || '<div class="prow"><div class="info"><small>まだ日記がないよ。1回あそぶと、ボンが書いてくれるよ。</small></div></div>'}</div>`;
+    $('listBody').onclick = null;
+  }
+  function openPet(){
+    const ch = G.player.char; let taps = 0, left = 10, over = false;
+    $('petImg').innerHTML = portrait(ch, '');
+    $('petTxt').textContent = `10びょうのあいだ、${CHAR[ch].name}を たくさんなでてあげよう！`;
+    $('petCnt').textContent = `なでた回数 0　のこり ${left}びょう`;
+    $('petClose').classList.add('hidden'); $('pet').classList.remove('hidden');
+    const tick = setInterval(() => {
+      left--; $('petCnt').textContent = `なでた回数 ${taps}　のこり ${Math.max(0, left)}びょう`;
+      if(left <= 0 && !over){
+        over = true; clearInterval(tick);
+        const coin = Math.min(60, taps * 3), bx = taps >= 20 ? 2 : (taps >= 10 ? 1 : 0);
+        save.coins += coin; const bm = bx ? bondAdd(ch, bx) : ''; writeSave(); sfx('win');
+        $('petTxt').textContent = taps ? `${CHAR[ch].name}は うれしそう！ +${coin}コイン ${bm || ''}` : 'もうすこし なでてあげてもよかったかも……';
+        $('petClose').classList.remove('hidden');
+      }
+    }, 1000);
+    $('petImg').onclick = e => {
+      if(over) return; taps++; sfx('tick');
+      $('petCnt').textContent = `なでた回数 ${taps}　のこり ${Math.max(0, left)}びょう`;
+      const h = document.createElement('span'); h.className = 'petheart'; h.textContent = '♥'; h.style.left = (20 + Math.random() * 60) + '%'; h.style.top = '30%'; h.style.color = ['#ff5d8f','#ff9acb','#ffb347'][taps % 3];
+      $('petImg').appendChild(h); setTimeout(() => h.remove(), 1000);
+    };
+    $('petClose').onclick = () => { over = true; clearInterval(tick); $('pet').classList.add('hidden'); };
+  }
+  function shareImage(){
+    if(!G) return;
+    const ch = G.player.char, W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+    const bg = g.createLinearGradient(0, 0, W, H); bg.addColorStop(0, '#ffe3ef'); bg.addColorStop(.5, '#fff8ec'); bg.addColorStop(1, '#e3f6ff'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+    g.fillStyle = 'rgba(255,122,162,.12)'; for(let i = -H; i < W; i += 140){ g.beginPath(); g.moveTo(i, 0); g.lineTo(i + 60, 0); g.lineTo(i + 60 + H, H); g.lineTo(i + H, H); g.fill(); }
+    const tg = g.createLinearGradient(240, 0, 840, 0); ['#ff5d8f','#ffb347','#ffd54a','#7be0b5','#4fc3f7','#b58cf0'].forEach((cl, i) => tg.addColorStop(i / 5, cl));
+    const FF = '"Hiragino Maru Gothic ProN","Yu Gothic UI",sans-serif';
+    g.textAlign = 'center'; g.font = '900 132px ' + FF; g.lineWidth = 16; g.strokeStyle = '#3b2d4a'; g.strokeText('BON BINGO', W / 2, 190); g.fillStyle = tg; g.fillText('BON BINGO', W / 2, 190);
+    const im = new Image();
+    im.onload = () => {
+      const ih = 640, iw = im.naturalWidth * ih / im.naturalHeight; g.drawImage(im, (W - iw) / 2, 250, iw, ih);
+      g.fillStyle = G.lastWin ? '#ff5d8f' : '#6a7fa8'; g.font = '900 150px ' + FF; g.lineWidth = 14; g.strokeStyle = '#fff';
+      const t = G.lastWin ? 'かち！' : 'まけ…'; g.strokeText(t, W / 2, 1060); g.fillText(t, W / 2, 1060);
+      g.fillStyle = '#3b2d4a'; g.font = '700 60px ' + FF;
+      g.fillText(`ビンゴ ${G.lastLines}本　${MODE_NAME[G.mode] || ''}`, W / 2, 1150);
+      g.font = '500 44px ' + FF; g.fillText(`${CHAR[ch].name} vs ${G.npc.name}　${dstr()}`, W / 2, 1220);
+      g.font = '500 34px sans-serif'; g.fillStyle = '#8a7a99'; g.fillText('© BON CREATIONS', W / 2, 1300);
+      c.toBlob(b => {
+        if(!b) return; const f = new File([b], 'bon-bingo.png', {type:'image/png'});
+        if(navigator.canShare && navigator.canShare({files:[f]})){ navigator.share({files:[f], text:'#BONBINGO'}).catch(() => {}); }
+        else { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'bon-bingo.png'; document.body.appendChild(a); a.click(); a.remove(); toast('画像を保存したよ'); }
+      }, 'image/png');
+    };
+    im.src = PIC[ch];
   }
   /* ===== 途中保存・再開 ===== */
   const RES_KEY = 'bonBingo.resume.v1';
@@ -1045,7 +1148,8 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     if(!d || !d.G || !d.G.cfg){ resClear(); return false; }
     G = d.G; G.paused = false; G.over = false; G.lastFlash = new Set(); G.hints = G.hints || new Set(); G.logs = G.logs || []; G.view = null;
     $('modeText').textContent = modeLabel(G.cfg);
-    $('npcTitle').textContent = `${CHAR[G.cfg.opp].name}（NPC）`;
+    $('npcTitle').textContent = G.cfg.duo ? `2P：${CHAR[G.cfg.opp].name}` : `${CHAR[G.cfg.opp].name}（NPC）`;
+    $('pTitle').textContent = G.cfg.duo ? `1P：${CHAR[G.player.char].name}` : 'あなたのカード';
     $('pauseBtn').textContent = '一時停止'; $('pauseBtn').setAttribute('aria-pressed', 'false'); $('pauseBtn').disabled = false;
     $('result').classList.add('hidden'); $('declBtn').classList.add('hidden');
     markSpeed(); go('game'); applyLand(); msg('つづきから はじめるよ！'); renderAll(); startTimer();
@@ -1054,7 +1158,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
   /* ===== はじめてガイド ===== */
   const GUIDE = [
     ['ビンゴのきほん', 'ボールの数字が出たら、カードの同じ数字のマスを タップして ひらこう。たて・よこ・ななめ 5つそろえたら ビンゴ！'],
-    ['オートが便利', '「オート」を押すと、出た数字を じどうで ひらいてくれるよ。おおぜいビンゴは オート専用。'],
+    ['オートが便利', '「オート」を押すと、出た数字を じどうで ひらいてくれるよ。おすすめは、カード20枚をオートで遊ぶ「どっさりビンゴ」！ ビンゴがどんどん増えて気持ちいいよ。逆ビンゴ（ビンゴが少ないほうの勝ち）もぜひ！'],
     ['BINGO！ボタン', 'ビンゴが出たら、そのターンのうちに画面の「BINGO!」ボタンを押すと ボーナスポイントがもらえるよ。'],
     ['かちまけ', 'ビンゴの数 → リーチの数 → ポイントの順で くらべるよ。ビンゴしても、きめられたターンまでゲームは つづく！'],
     ['ホーム画面に追加するなら', 'アプリみたいにホーム画面に追加するときは、追加する「前」に 設定の「アプリのアイコン」で ボールの中のボンを選んでね。追加したあとは変えられないよ。'],
@@ -1113,7 +1217,8 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
 
     const flash = new Set();
     const goldP = (P.char === 'oko' ? 100 + 5 * (lvOf('oko') - 1) : 50) * dbl;
-    if(save.sett.auto || G.cfg.many){ P.cards.forEach((card, ci) => markCard(card, n, 1, 'p'+ci, flash, goldP)); }
+    if(G.cfg.rev && G.shield){ G.shield = false; msg('シールドで 数字をさけた！'); sfx('tick'); }
+    else if(G.cfg.many || G.cfg.rev || (save.sett.auto && !G.cfg.duo)){ P.cards.forEach((card, ci) => markCard(card, n, 1, 'p'+ci, flash, goldP)); }
     const nprob = N.prob * (P.char === 'nemu' && G.turn <= 8 + Math.floor((lvOf('nemu') - 1) / 3) ? 0.4 : 1);
     N.cards.forEach((card, ci) => markCard(card, n, nprob, 'n'+ci, flash, 50));
     if(G.boss && G.turn % 10 === 0){
@@ -1127,6 +1232,10 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     sfx('tick');
     say(bonCall(n, P.char), G.cfg.pic ? `${LET[Math.floor((n-1)/15)]}, ${CHAR[PICORDER[(n - 1) % 15]].name}` : `${LET[Math.floor((n-1)/15)]}, ${enNum(n)}`);
     if(G.cfg.pic) msg(`${LET[Math.floor((n - 1) / 15)]}の${CHAR[PICORDER[(n - 1) % 15]].name}！`);
+    if(G.turn % 9 === 0 && G.turn < G.maxTurns - 2 && !G.cfg.many && !G.cfg.duo && !G.cfg.solo && G.cfg.speed !== 'turbo' && CHATS[P.char] && CHATS[N.char]){
+      bub('p', CHATS[P.char].o, 3200); const rl = bondLv(N.char) >= 3 ? CHATS[N.char].rf : CHATS[N.char].r;
+      setTimeout(() => { if(G && !G.over) bub('n', rl, 3200); }, 1800);
+    }
 
     if(P.char === 'niji') randomSkill(true);
     if(N.char === 'niji') randomSkill(false);
@@ -1213,7 +1322,8 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
   }
 
   function renderAll(){
-    $('autoBtn').setAttribute('aria-pressed', String(!!save.sett.auto || !!(G.cfg && G.cfg.many)));
+    $('autoBtn').setAttribute('aria-pressed', String(G && G.cfg && G.cfg.duo ? false : (!!save.sett.auto || !!(G && G.cfg && (G.cfg.many || G.cfg.rev)))));
+    if(G && G.cfg){ $('shieldBtn').classList.toggle('hidden', !G.cfg.rev); if(G.cfg.rev) $('shieldBtn').textContent = G.shield ? 'シールド構え中！' : `シールド×${G.shields}`; }
     if(!G) return;
     const b = $('ballEl');
     const n = G.drawn[G.drawn.length-1];
@@ -1251,11 +1361,11 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     else if(card.open[r][c]) cls += ' open dau-' + save.daub.sel;
     if(flash.has(key)) cls += ' flash';
     if(isP && hints.has(key)) cls += ' hint';
-    if(isP && v > 0 && !card.open[r][c] && G && G.drawn.includes(v)) cls += ' ready';
+    if((isP || (G && G.cfg && G.cfg.duo)) && v > 0 && !card.open[r][c] && G && G.drawn.includes(v)) cls += ' ready';
     if(isP && !card.open[r][c] && card.gold.has(k)) cls += ' gold';
     if(isP && !card.open[r][c] && v > 0){ if(card.chest.has(k)) cls += ' chest'; else if(card.coin.has(k)) cls += ' coinc'; else if(G && G.lucky === v) cls += ' lucky'; }
     if(G && G.cfg && G.cfg.pic && v > 0){ cls += ' pcell'; if(!card.open[r][c]) cls += ' bz bzf-' + ((v - 1) % 15); }
-    const data = isP ? ` data-ci="${ci}" data-r="${r}" data-c="${c}"` : '';
+    const data = (isP || (G && G.cfg && G.cfg.duo)) ? ` data-ci="${ci}" data-r="${r}" data-c="${c}"` : '';
     return `<div class="${cls}"${data}>${v === 0 ? 'FREE' : vLabel(v)}</div>`;
   }
   function cardHTML(card, ci, isP, flash, hints){
@@ -1304,13 +1414,28 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     $('pagePrev').disabled = v.page <= 0; $('pageNext').disabled = v.page >= pages - 1;
   }
 
+  $('npcCards').addEventListener('click', e => {
+    if(!G || G.over || !G.cfg.duo) return;
+    const cell = e.target.closest('[data-r]');
+    if(cell) manualMark(Number(cell.dataset.ci), Number(cell.dataset.r), Number(cell.dataset.c), 'n');
+  });
+  $('resShare').addEventListener('click', shareImage);
   $('playerCards').addEventListener('click', e => {
     if(!G || G.over) return;
     const cell = e.target.closest('[data-r]');
     if(cell) manualMark(Number(cell.dataset.ci), Number(cell.dataset.r), Number(cell.dataset.c));
   });
 
-  function manualMark(ci, r, c){
+  function manualMark(ci, r, c, side){
+    if(side === 'n'){
+      const card = G.npc.cards[ci], v = card.nums[r][c];
+      if(v === 0 || card.open[r][c]) return;
+      if(!G.drawn.includes(v)){ toast('まだ出てない数字だよ'); return; }
+      const before = lineCount([card]); card.open[r][c] = true; settleCard(card, G.turn, G.maxTurns, 1);
+      G.lastFlash = new Set([`n${ci}-${r}-${c}`]); sfx('tick');
+      if(lineCount([card]) > before){ msg('2Pの ビンゴ！'); bub('n', REACT[G.npc.char].bingo); bub('p', TALK[G.player.char].envy); }
+      renderAll(); return;
+    }
     const card = G.player.cards[ci], v = card.nums[r][c];
     if(v === 0 || card.open[r][c]) return;
     if(!G.drawn.includes(v)){ toast('まだ出てない数字だよ'); return; }
@@ -1321,7 +1446,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     computeHints(); renderAll();
   }
   function setAuto(on){
-    if(G && G.cfg && G.cfg.many && !G.over){ toast('おおぜいビンゴはオート専用だよ'); return; }
+    if(G && G.cfg && (G.cfg.many || G.cfg.rev || G.cfg.duo) && !G.over){ toast(G.cfg.duo ? 'ふたり対戦は マニュアルだよ' : 'このモードは オート専用だよ'); return; }
     save.sett.auto = on; writeSave();
     if(on && G && !G.over){
       let lines = 0;
@@ -1344,7 +1469,15 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     $('pauseBtn').setAttribute('aria-pressed', String(G.paused));
   }
   $('pauseBtn').addEventListener('click', togglePause);
+  $('shieldBtn').addEventListener('click', () => {
+    if(!G || G.over || G.paused || !G.cfg.rev) return;
+    if(G.shield){ toast('もう構えてるよ'); return; }
+    if(G.shields <= 0){ toast('シールドがないよ'); return; }
+    G.shield = true; G.shields--; sfx('tick'); toast('シールド！ 次の数字をさけるよ'); renderAll();
+  });
   $('nextBtn').addEventListener('click', () => { if(!G || G.over || G.paused) return; drawNext(); resSave(); startTimer(); });
+  $('btnRev').addEventListener('click', () => { const m = MODES2.find(x => x.id === 'rev'); const pool = ['oko','nico','hyoe','mogu','nemu','tere']; startGame(Object.assign({opp:pool[Math.floor(Math.random() * pool.length)]}, m.cfg())); });
+  $('btnMany').addEventListener('click', () => { const m = MODES2.find(x => x.id === 'many'); const pool = ['oko','nico','hyoe','mogu','nemu','tere']; MANY_N = 20; startGame(Object.assign({opp:pool[Math.floor(Math.random() * pool.length)]}, m.cfg())); });
   $('btnResume').addEventListener('click', () => { if(!resumeGame()) toast('つづきのデータが ないよ'); });
   $('quitBtn').addEventListener('click', () => { if(G && !G.over && !confirm('対戦をやめてタイトルに戻る？\n（使ったチケットは戻らないよ）')) return; goTitle(); });
   document.querySelectorAll('.spd').forEach(b => b.addEventListener('click', () => {
@@ -1500,7 +1633,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     else { P.adj += 60; msg('？イベント：大ボーナス +60pt'); }
     sfx('item');
   }
-  let MANY_N = 12;
+  let MANY_N = 20;
   const MODES2 = [
     {id:'mystery', name:'ミステリービンゴ', desc:'ランダムイベントが起きる！ コイン・ボーナス・抽選速度の変化…', met:'スコア',
       cfg:() => ({mode:'mystery', diff:'normal', cards:2, maxTurns:30, speed:'normal', useItems:true})},
@@ -1512,12 +1645,16 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
       cfg:() => ({mode:'rank', diff:RANKS[rankIdx(save.rank.pt)].d, cards:2, maxTurns:30, speed:'normal', useItems:true})},
     {id:'pic', name:'ボンの絵柄ビンゴ', desc:'数字のかわりにボンがならぶ。1列に5人（8人の中から）。「ビーのひょえボン！」と呼ばれたら、B列のひょえボンのマスを開けよう', met:'スコア',
       cfg:() => ({mode:'pic', pic:true, diff:'normal', cards:2, maxTurns:30, speed:'normal'})},
-    {id:'many', name:'おおぜいビンゴ', desc:'カードが8〜20枚！ オート専用でどんどんビンゴをふやそう。あいてもおなじ枚数', met:'ビンゴ本数',
+    {id:'many', name:'どっさりビンゴ', desc:'カードが8〜100枚（20・50・100枚もえらべる）！ たくさんのカードをオートでどんどんビンゴ！ ボンのオリジナルモードで、いちばんのおすすめ。あいてもおなじ枚数', met:'ビンゴ本数',
       cfg:() => ({mode:'many', many:true, diff:'normal', cards:MANY_N, maxTurns:30, speed:'normal'})},
     {id:'solo', name:'ひとりビンゴ', desc:'あいてはいない！ カード3枚・40ターンで、ビンゴ2本をめざそう', met:'ビンゴ本数',
       cfg:() => ({mode:'solo', solo:true, goal:2, diff:'easy', cards:3, maxTurns:40, speed:'normal'})},
     {id:'turbo', name:'ターボビンゴ', desc:'0.5びょうで数字が出る！ カード3枚・50ターン。オートでスピード勝負（あいては つよめ）', met:'ビンゴ本数',
       cfg:() => ({mode:'turbo', diff:'hard', cards:3, maxTurns:50, speed:'turbo'})},
+    {id:'rev', name:'逆ビンゴ', desc:'ボンのオリジナルルール！ ビンゴが「少ない」ほうの勝ち！ 数字は自動で開く。「シールド」で次の数字をさけよう（5回）', met:'ビンゴ本数',
+      cfg:() => ({mode:'rev', rev:true, diff:'normal', cards:3, maxTurns:30, speed:'normal'})},
+    {id:'duo', name:'ふたり対戦', desc:'1台でふたり対戦！ 上が1P、下が2Pのカード。それぞれ自分のカードをタップ。はやいもの勝ち', met:'ビンゴ本数',
+      cfg:() => ({mode:'duo', duo:true, diff:'easy', cards:1, maxTurns:30, speed:'normal'})},
     {id:'double', name:'ダブルビンゴ', desc:'カード3枚・40ターン。ビンゴを4本そろえたら勝ち！', met:'ビンゴ本数',
       cfg:() => ({mode:'double', diff:'easy', cards:3, maxTurns:40, speed:'normal', useItems:true})}
   ];
@@ -1526,10 +1663,10 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     const pool = ['oko','nico','hyoe','mogu','nemu','tere'];
     const ri = rankIdx(save.rank.pt), rn = RANKS[ri], rx = RANKS[ri + 1];
     const rbox = `<div class="rankbox">リーグ戦ランク<br><b>${rn.n}</b>　${save.rank.pt}pt${rx ? `<div class="bar" style="margin:6px auto 0;max-width:240px"><i style="width:${Math.round((save.rank.pt - rn.at) / (rx.at - rn.at) * 100)}%"></i></div><small>次の${rx.n}まで あと${rx.at - save.rank.pt}pt</small>` : '<br><small>最高ランク！</small>'}</div>`;
-    const manyRow = `<div class="row" style="margin:6px 0"><span>おおぜいビンゴの枚数</span><div class="opts">${[8,10,12,16,20].map(n => `<button class="opt" data-mn="${n}" aria-pressed="${n === MANY_N}">${n}枚</button>`).join('')}</div></div>`;
-    $('listBody').innerHTML = rbox + manyRow + `<div class="plist">` + MODES2.map(m => {
+    const manyRow = `<div class="row" style="margin:6px 0"><span>どっさりビンゴの枚数</span><div class="opts">${[8,12,20,50,100].map(n => `<button class="opt" data-mn="${n}" aria-pressed="${n === MANY_N}">${n}枚</button>`).join('')}</div></div>`;
+    $('listBody').innerHTML = rbox + manyRow + `<div class="plist">` + MODES2.slice().sort((a, b) => (b.id === 'many') * 2 + (b.id === 'rev') - ((a.id === 'many') * 2 + (a.id === 'rev'))).map(m => {
       const r = recOf(m.id);
-      return `<div class="prow"><div class="info"><b>${m.name}</b><small>${m.desc}<br>${m.id === 'rank' ? `いまのランク：${RANKS[rankIdx(save.rank.pt)].n}（${save.rank.pt}pt）${rankIdx(save.rank.pt) < RANKS.length - 1 ? `／次まで あと${RANKS[rankIdx(save.rank.pt) + 1].at - save.rank.pt}pt` : ''}` : `自己ベスト（${m.met}）：${r.best}　プレイ ${r.played}回`}</small></div><button class="btn small" data-m2="${m.id}">あそぶ</button></div>`;
+      return `<div class="prow${m.id === 'many' || m.id === 'rev' ? ' rec' : ''}"><div class="info"><b>${m.id === 'many' ? '<span class="badge">ボンオリジナル！おすすめ！</span>' : (m.id === 'rev' ? '<span class="badge">ボンオリジナル！</span>' : '')}${m.name}</b><small>${m.desc}<br>${m.id === 'rank' ? `いまのランク：${RANKS[rankIdx(save.rank.pt)].n}（${save.rank.pt}pt）${rankIdx(save.rank.pt) < RANKS.length - 1 ? `／次まで あと${RANKS[rankIdx(save.rank.pt) + 1].at - save.rank.pt}pt` : ''}` : `自己ベスト（${m.met}）：${r.best}　プレイ ${r.played}回`}</small></div><button class="btn small" data-m2="${m.id}">あそぶ</button></div>`;
     }).join('') + `</div>`;
     $('listBody').onclick = e => {
       const mn = e.target.closest('[data-mn]');
@@ -1540,7 +1677,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
       startGame(Object.assign({opp:pool[Math.floor(Math.random() * pool.length)]}, m.cfg()));
     };
   }
-  const MODE_NAME = {story:'ストーリー', free:'フリービンゴ', tournament:'トーナメント', challenge:'チャレンジ', boss:'ボスビンゴ', mystery:'ミステリー', endless:'エンドレス', survival:'サバイバル', double:'ダブル', many:'おおぜい', solo:'ひとり', turbo:'ターボ', rank:'リーグ戦', pic:'絵柄'};
+  const MODE_NAME = {story:'ストーリー', free:'フリービンゴ', tournament:'トーナメント', challenge:'チャレンジ', boss:'ボスビンゴ', mystery:'ミステリー', endless:'エンドレス', survival:'サバイバル', double:'ダブル', many:'どっさり', solo:'ひとり', turbo:'ターボ', rev:'逆ビンゴ', duo:'ふたり対戦', rank:'リーグ戦', pic:'絵柄'};
   function openStats(){
     listHead('戦績・記録');
     const st = save.stats, lose = st.played - st.wins;
@@ -1612,7 +1749,8 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     const ps = score(P), ns = score(N);
     const lines = lineCount(P.cards);
     const pl = lineCount(P.cards), nl = lineCount(N.cards), pr = reachCount(P.cards), nr = reachCount(N.cards);
-    const cmp = pl !== nl ? pl - nl : (pr !== nr ? pr - nr : ps - ns);   // ビンゴ数 → リーチ数 → ポイント の順で決める
+    let cmp = pl !== nl ? pl - nl : (pr !== nr ? pr - nr : ps - ns);   // ビンゴ数 → リーチ数 → ポイント の順で決める
+    if(G.mode === 'rev') cmp = -cmp;
     let win = cmp > 0;
     if(G.challenge) win = G.challenge.check(G);
     if(G.mode === 'double') win = pl >= 4;
@@ -1648,9 +1786,12 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     sfx(win ? 'win' : 'lose');
     if(win){ say('やったね！', 'You win!'); fireworks(); }
 
-    $('resTitle').textContent = win ? 'かち！' : (cmp === 0 && !G.challenge ? 'ひきわけ' : 'まけ…');
-    $('resText').textContent = G.mode === 'solo' ? `ビンゴ ${pl}本（目標 ${G.cfg.goal}本）　${ps}pt` : `ビンゴ ${pl} ／ ${nl}　リーチ ${pr} ／ ${nr}　（あなた ${ps}pt ／ ${N.name} ${ns}pt）`;
-    $('resBody').innerHTML = `ビンゴ数：${lines}　獲得コイン：+${coins}<br>${bonusMsg}${G.challenge ? (win ? 'チャレンジ成功！' : 'チャレンジ失敗…') : ''}${G.extraRes || ''}`;
+    $('resTitle').textContent = G.mode === 'duo' ? (cmp > 0 ? '1Pの かち！' : (cmp < 0 ? '2Pの かち！' : 'ひきわけ')) : (win ? 'かち！' : (cmp === 0 && !G.challenge ? 'ひきわけ' : 'まけ…'));
+    $('resText').textContent = G.mode === 'duo' ? `1P ビンゴ ${pl}本 ／ 2P ビンゴ ${nl}本` : G.mode === 'solo' ? `ビンゴ ${pl}本（目標 ${G.cfg.goal}本）　${ps}pt` : `ビンゴ ${pl} ／ ${nl}　リーチ ${pr} ／ ${nr}　（あなた ${ps}pt ／ ${N.name} ${ns}pt）`;
+    const dtx = diaryText(P.char, win, pl, N.name);
+    save.diary = save.diary || []; save.diary.unshift({d:dstr(), c:P.char, m:G.mode, w:win, n:pl, t:dtx}); if(save.diary.length > 40) save.diary.length = 40; writeSave();
+    $('resBody').innerHTML = `ビンゴ数：${lines}　獲得コイン：+${coins}<br>${bonusMsg}${G.challenge ? (win ? 'チャレンジ成功！' : 'チャレンジ失敗…') : ''}${G.extraRes || ''}<div class="diary"><b>📖 ${CHAR[P.char].name}の にっき（${dstr()}）</b>${dtx}</div>${win ? '<button class="btn" id="petBtn">ごほうびタイム♥</button>' : ''}`;
+    { const pb = $('petBtn'); if(pb) pb.onclick = () => { pb.disabled = true; openPet(); }; }
     const canNext = (G.mode === 'tournament' && T && win && T.round < 4) || (G.mode === 'survival' && SV && win);
     $('resNext').classList.toggle('hidden', !canNext);
     if(canNext){ $('resNext').onclick = () => { $('result').classList.add('hidden'); if(G.mode === 'survival') startSurvivalRound(); else { T.round++; startTournamentRound(); } }; }
