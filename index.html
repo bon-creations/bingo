@@ -145,6 +145,10 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
 .target{position:sticky;top:6px;z-index:5;background:var(--pink);color:#fff;border-radius:14px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:bold;margin-bottom:8px}
 .target button{background:#fff;color:var(--pink-d);border:none;border-radius:999px;padding:4px 12px;font:inherit;font-weight:bold;cursor:pointer}
 .banner{position:fixed;left:50%;top:26%;transform:translate(-50%,-50%) rotate(-4deg) scale(.6);font:900 clamp(2rem,10vw,4rem) system-ui;color:#fff;background:linear-gradient(90deg,#ff7aa2,#ffd54a,#7be0b5,#4fc3f7);padding:10px 30px;border-radius:30px;border:4px solid #fff;box-shadow:0 8px 0 rgba(59,45,74,.35);text-shadow:0 2px 0 #3b2d4a;opacity:0;pointer-events:none;z-index:25;white-space:nowrap;transition:opacity .2s,transform .3s}
+.nextrec{margin:0 auto 8px;text-align:center;font-weight:900;color:#c2407c;font-size:.95rem}
+@keyframes recp{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,122,162,.7)}50%{transform:scale(1.03);box-shadow:0 0 0 10px rgba(255,122,162,0)}}
+.recnext{animation:recp 1.3s infinite}
+.banner.reachb{background:linear-gradient(90deg,#ffb347,#ff7aa2)}
 .banner.show{opacity:1;transform:translate(-50%,-50%) rotate(-4deg) scale(1)}
 .toastline{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 16px;border-radius:16px;font-weight:bold;opacity:0;transition:opacity .2s;pointer-events:none;z-index:24;max-width:90vw;text-align:center}
 .toastline.show{opacity:1}
@@ -305,10 +309,12 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
 <g class="lb" style="animation-delay:0.0s"><circle cx="150" cy="168" r="21" fill="#d63a2f" stroke="#fff" stroke-width="4"/><circle cx="139" cy="153" r="3.5" fill="#fff" opacity=".6"/><text x="150" y="175" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#00000055" stroke-width="1" font-family="Arial Black,Impact,sans-serif">B</text></g><g class="lb" style="animation-delay:0.25s"><circle cx="205" cy="168" r="21" fill="#e0b019" stroke="#fff" stroke-width="4"/><circle cx="194" cy="153" r="3.5" fill="#fff" opacity=".6"/><text x="205" y="175" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#00000055" stroke-width="1" font-family="Arial Black,Impact,sans-serif">I</text></g><g class="lb" style="animation-delay:0.5s"><circle cx="260" cy="168" r="21" fill="#3f7be0" stroke="#fff" stroke-width="4"/><circle cx="249" cy="153" r="3.5" fill="#fff" opacity=".6"/><text x="260" y="175" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#00000055" stroke-width="1" font-family="Arial Black,Impact,sans-serif">N</text></g><g class="lb" style="animation-delay:0.75s"><circle cx="315" cy="168" r="21" fill="#3fa764" stroke="#fff" stroke-width="4"/><circle cx="304" cy="153" r="3.5" fill="#fff" opacity=".6"/><text x="315" y="175" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#00000055" stroke-width="1" font-family="Arial Black,Impact,sans-serif">G</text></g><g class="lb" style="animation-delay:1.0s"><circle cx="370" cy="168" r="21" fill="#8b5cc4" stroke="#fff" stroke-width="4"/><circle cx="359" cy="153" r="3.5" fill="#fff" opacity=".6"/><text x="370" y="175" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#00000055" stroke-width="1" font-family="Arial Black,Impact,sans-serif">O</text></g>
 </svg></h1>
   <p class="tagline">ボンたちと一緒にビンゴで勝負しよう！</p>
+  <div class="nextrec hidden" id="nextRec"></div>
   <button class="btn small sub hidden" id="iconHint" data-go="sett" style="margin:0 auto 8px;display:block">📱 ホーム画面に追加する前に、アイコンのボンを選んでね</button>
   <div class="coinline">コイン <span id="coinsTitle">0</span>　／　チケット <span id="tkTitle">0</span>　<small id="tkNext"></small><br><span id="recordTitle"></span></div>
   <div class="panel">
     <div class="menu">
+      <button class="btn hot hidden" style="grid-column:1/-1" id="btnTutor"><span class="rec">はじめてさん</span> れんしゅう対戦<small>ヒントを見ながら、チケットなしで1回あそべる</small></button>
       <button class="btn" style="grid-column:1/-1" data-go="char">じぶんのボンを えらぶ（キャラクター）</button>
       <button class="btn hidden" style="grid-column:1/-1" id="btnResume">つづきから</button>
       <button class="btn hot" id="btnMany" style="grid-column:1/-1"><span class="rec">ボンオリジナル！</span> どっさりビンゴ（20枚）<small>カード20枚をオートでどんどんビンゴ！</small></button>
@@ -390,6 +396,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
       <button class="opt" id="landBtn" aria-pressed="false">横持ち</button>
       <button class="opt" id="autoBtn" aria-pressed="false">オート</button>
       <button class="opt" id="pauseBtn" aria-pressed="false">一時停止</button>
+      <button class="opt" id="termBtn">?ことば</button>
       <button class="opt" id="quitBtn">やめる</button>
     </div>
   </div>
@@ -647,8 +654,8 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     }
     return out;
   }
-  /* チケット：時間で溜まる（5分に1枚、最大10枚。オフラインでも経過時間で加算） */
-  const TK_MAX = 10, TK_INT = 5 * 60 * 1000;
+  /* チケット：時間で溜まる（3分に1枚、最大20枚。オフラインでも経過時間で加算） */
+  const TK_MAX = 20, TK_INT = 3 * 60 * 1000;
   function tkUpdate(){
     const now = Date.now();
     if(save.tk.n >= TK_MAX){ save.tk.t = now; return; }
@@ -829,6 +836,12 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     $('coinsTitle').textContent = s.coins;
     $('tkTitle').textContent = `${s.tk.n} / ${TK_MAX}`;
     $('tkNext').textContent = s.tk.n >= TK_MAX ? '' : `（あと${tkWait()}分で+1）`;
+    { const rc = id => (s.rec[id] || {}).played || 0;
+      const nx = s.stats.played === 0 ? ['btnTutor','まずは れんしゅう対戦から！'] : (!rc('many') ? ['btnMany','つぎは どっさりビンゴを あそんでみよう！'] : (!rc('rev') ? ['btnRev','つぎは 逆ビンゴに ちょうせん！'] : (!rc('duo') ? null : null)));
+      $('btnTutor').classList.toggle('hidden', s.stats.played > 0);
+      ['btnTutor','btnMany','btnRev'].forEach(id => $(id).classList.remove('recnext'));
+      $('nextRec').classList.toggle('hidden', !nx);
+      if(nx){ $('nextRec').textContent = '👉 ' + nx[1]; $(nx[0]).classList.add('recnext'); } }
     $('recordTitle').textContent = `戦績 ${s.stats.played}戦 ${s.stats.wins}勝　ランク ${RANKS[rankIdx(s.rank.pt)].n}`;
     $('selPortrait').innerHTML = portrait(s.sel);
     $('selPortrait').className = 'portrait-sm frm-' + s.frame.sel;
@@ -872,7 +885,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
       return `<div class="prow">${portrait(x.id,'') .replace('<img','<img style="width:70px;height:80px;object-fit:contain"')}
         <div class="info"><b>${c.name}<span class="tag ${cleared?'ok':''}">${cleared?'クリア':'未クリア'}</span></b>
         <small>難易度：${DIFF[x.diff].name}　勝つとボンが仲間になる</small></div>
-        <button class="btn small" data-story="${x.id}" data-diff="${x.diff}" ${x.id === save.sel ? 'disabled' : ''}>${x.id === save.sel ? 'いまの じぶん' : 'たたかう'}</button></div>`;
+        <button class="btn small" data-story="${x.id}" data-diff="${x.diff}">${x.id === save.sel ? 'じぶんと たたかう' : 'たたかう'}</button></div>`;
     }).join('');
     $('listBody').innerHTML = `<div class="plist">${rows}</div>`;
     $('listBody').onclick = e => {
@@ -963,6 +976,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
       <h2>アプリのアイコン</h2><div class="row" style="flex-direction:column;align-items:stretch"><span>ボールの中のボンをえらぶ<br><small>ホーム画面に追加する「前」に えらんでね（追加したあとは変えられないよ）</small></span><div class="icopick">${PICORDER.map(id => `<button class="icob" data-icon="${id}" aria-pressed="${(save.sett.iconChar || 'oko') === id}"><img src="${PIC[id]}" alt="${CHAR[id].name}"><small>${CHAR[id].name.replace('ボン','')}</small></button>`).join('')}</div></div>
       <h2>セーブデータ</h2><div class="row"><span>データの書き出し<br><small>ファイルに保存（バックアップ）</small></span><button class="btn small" data-act="export">書き出す</button></div>
       <div class="row"><span>データの読み込み<br><small>書き出したファイルから復元</small></span><button class="btn small sub" data-act="import">読み込む</button></div>
+      <div class="row"><span>引き継ぎコード<br><small>ホーム画面に追加する前にコピー → 追加したアプリで貼り付け</small></span><div class="opts"><button class="btn small" data-act="codecopy">コピー</button><button class="btn small sub" data-act="codepaste">貼り付け</button></div></div>
       <div class="row"><span>データを消す<br><small>はじめからやり直す</small></span><button class="btn small sub" data-act="reset">消す</button></div>
       <input type="file" id="saveFile" accept=".json,application/json" class="hidden"></div>`;
     $('saveFile').onchange = e => {
@@ -1000,6 +1014,22 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
           const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'bon-bingo-save.json';
           document.body.appendChild(a); a.click(); a.remove(); toast('書き出したよ');
         } else if(act === 'import'){ $('saveFile').click(); }
+        else if(act === 'codecopy'){
+          const code = 'BONBINGO1:' + btoa(unescape(encodeURIComponent(JSON.stringify(save))));
+          const done = () => toast('引き継ぎコードをコピーしたよ');
+          if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(code).then(done).catch(() => { prompt('このコードを全部コピーしてね', code); }); }
+          else prompt('このコードを全部コピーしてね', code);
+        }
+        else if(act === 'codepaste'){
+          const code = prompt('コピーした引き継ぎコードを貼ってね'); if(!code) return;
+          try {
+            const o = JSON.parse(decodeURIComponent(escape(atob(code.trim().replace(/^BONBINGO1:/, '')))));
+            if(!o || typeof o !== 'object' || typeof o.coins !== 'number' || !o.stats) throw new Error('bad');
+            if(!confirm('いまのデータは上書きされるよ。引き継ぐ？')) return;
+            try { localStorage.setItem(SAVE_KEY + '.bak', localStorage.getItem(SAVE_KEY) || ''); } catch(_){}
+            localStorage.setItem(SAVE_KEY, JSON.stringify(o)); location.reload();
+          } catch(err){ toast('このコードは読み込めないよ'); }
+        }
         else if(act === 'reset'){
           if(confirm('セーブデータを全部消す？（もとに戻せないよ）') && confirm('ほんとうに消していい？')){
             try { localStorage.setItem(SAVE_KEY + '.bak', localStorage.getItem(SAVE_KEY) || ''); localStorage.removeItem(SAVE_KEY); } catch(_){}
@@ -1035,14 +1065,14 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
 
   /* ===== 対戦の開始 ===== */
   function startGame(cfg){
-    const freeEntry = (cfg.mode === 'tournament' && T && T.round > 1) || (cfg.mode === 'survival' && SV && SV.round > 1);
+    const freeEntry = (cfg.mode === 'tournament' && T && T.round > 1) || (cfg.mode === 'survival' && SV && SV.round > 1) || cfg.duo || cfg.solo || cfg.tutorial;   // ふたり対戦・ひとりビンゴはチケット不要
     tkUpdate();
     if(!freeEntry && !save.dbg && save.tk.n < 1){ toast(`チケットがないよ（あと${tkWait()}分で1枚）`); return false; }
     beginGame(cfg, [], freeEntry);
     return true;
   }
   function beginGame(cfg, bring, freeEntry){
-    if(cfg.opp === save.sel && !cfg.boss){
+    if(cfg.opp === save.sel && !cfg.boss && cfg.mode !== 'story'){
       const alt = ['oko','nico','hyoe','mogu','nemu','tere'].filter(x => x !== save.sel);
       cfg = Object.assign({}, cfg, {opp:alt[Math.floor(Math.random() * alt.length)]});
     }
@@ -1194,18 +1224,30 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     ['オートが便利', '「オート」を押すと、出た数字を じどうで ひらいてくれるよ。おすすめは、カード20枚をオートで遊ぶ「どっさりビンゴ」！ ビンゴがどんどん増えて気持ちいいよ。逆ビンゴ（ビンゴが少ないほうの勝ち）もぜひ！'],
     ['BINGO！ボタン', 'ビンゴが出たら、そのターンのうちに画面の「BINGO!」ボタンを押すと ボーナスポイントがもらえるよ。'],
     ['かちまけ', 'ビンゴの数 → リーチの数 → ポイントの順で くらべるよ。ビンゴしても、きめられたターンまでゲームは つづく！'],
-    ['ホーム画面に追加するなら', 'アプリみたいにホーム画面に追加するときは、追加する「前」に 設定の「アプリのアイコン」で ボールの中のボンを選んでね。追加したあとは変えられないよ。'],
+    ['ホーム画面に追加するなら', 'アプリみたいにホーム画面に追加するときは、追加する「前」に 設定の「アプリのアイコン」で ボールの中のボンを選んでね。追加したあとは変えられないよ。iPhoneは ホーム画面のアプリだと保存データが別になるから、追加する前に 設定の「引き継ぎコード」をコピーして、追加したアプリで貼り付けてね。'],
     ['べんりな ボタン', '「ゆっくり〜ターボ」で スピード変更、「つぎへ」で すぐ次の数字、「一時停止」「やめる」もあるよ。うごかなくなっても 途中から つづけられる！']
   ];
-  function showGuide(done){
+  const TERMS = [
+    ['ビンゴ', 'たて・よこ・ななめの どれかで 5マスそろうと 1ビンゴ。ビンゴが多いほど有利だよ（逆ビンゴは少ないほうが勝ち）。'],
+    ['リーチ', 'あと1マスで ビンゴになる列のこと。リーチが多いと、画面がキラッと光るよ。'],
+    ['ポイント', 'マスを開いたり、ビンゴしたりで たまる点数。ビンゴ数・リーチ数が同じときの決め手になる。'],
+    ['スキル', 'キャラごとの とくべつな力。ひょえボンは次の数字を先読み、ねむボンは相手をねむらせるよ。'],
+    ['オート', '出た数字を じどうで ひらいてくれる機能。どっさり・逆ビンゴは オート専用。'],
+    ['シールド', '逆ビンゴで使える ぼうぎょ。押すと、次に出る数字を さけられる（5回まで）。'],
+    ['BINGO!ボタン', 'ビンゴしたターンのうちに押すと、宣言ボーナスのポイントがもらえる。']
+  ];
+  const TUTOR_TIPS = {1:'数字が出たら、カードの同じ数字を タップ！', 4:'たて・よこ・ななめ 5つそろえたら ビンゴ！', 8:'あと1マスでそろう列は「リーチ」！ 光ってるよ', 12:'ビンゴしたら「BINGO!」ボタンを おそう！ ボーナスだよ', 18:'ビンゴ数 → リーチ数 → ポイントの順で勝ち負けが決まるよ'};
+  function tutorTip(){ if(G && G.cfg && G.cfg.tutorial && TUTOR_TIPS[G.turn]){ toast(TUTOR_TIPS[G.turn]); msg('ヒント：' + TUTOR_TIPS[G.turn]); } }
+  function showGuide(done, list){
+    const GL = list || GUIDE;
     let i = 0;
     const draw = () => {
-      $('gDots').innerHTML = GUIDE.map((_, k) => k === i ? '<b>●</b>' : '○').join(' ');
-      $('gTitle').textContent = GUIDE[i][0]; $('gText').textContent = GUIDE[i][1];
-      $('gNext').textContent = i === GUIDE.length - 1 ? 'はじめる！' : 'つぎへ';
+      $('gDots').innerHTML = GL.map((_, k) => k === i ? '<b>●</b>' : '○').join(' ');
+      $('gTitle').textContent = GL[i][0]; $('gText').textContent = GL[i][1];
+      $('gNext').textContent = i === GL.length - 1 ? (list ? 'とじる' : 'はじめる！') : 'つぎへ';
     };
     const close = () => { $('guide').classList.add('hidden'); if(done) done(); };
-    $('gNext').onclick = () => { if(i >= GUIDE.length - 1) close(); else { i++; draw(); } };
+    $('gNext').onclick = () => { if(i >= GL.length - 1) close(); else { i++; draw(); } };
     $('gSkip').onclick = close;
     draw(); $('guide').classList.remove('hidden');
   }
@@ -1264,7 +1306,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     P.cards.forEach(card => pl += settleCard(card, G.turn, G.maxTurns, pmult));
     N.cards.forEach(card => nl += settleCard(card, G.turn, G.maxTurns, nmult));
     G.lastFlash = flash;
-    sfx('tick');
+    sfx('tick'); tutorTip();
     say(bonCall(n, P.char), G.cfg.pic ? `${LET[Math.floor((n-1)/15)]}, ${CHAR[PICORDER[(n - 1) % 15]].name}` : `${LET[Math.floor((n-1)/15)]}, ${enNum(n)}`);
     if(G.cfg.pic) msg(`${LET[Math.floor((n - 1) / 15)]}の${CHAR[PICORDER[(n - 1) % 15]].name}！`);
     if(G.turn % 9 === 0 && G.turn < G.maxTurns - 2 && !G.cfg.many && !G.cfg.duo && !G.cfg.solo && G.cfg.speed !== 'turbo' && CHATS[P.char] && CHATS[N.char]){
@@ -1300,11 +1342,11 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
   function bingoFX(n){
     sfx('bingo');
     say(n > 1 ? 'ビンゴ、ダブル！' : 'ビンゴ！', n > 1 ? 'Double bingo!' : 'Bingo!');
-    confetti(160);
+    confetti(160); if(n > 1) fireworks();
     if(fxOn()){
     const g = $('game'); g.classList.remove('shake'); void g.offsetWidth; g.classList.add('shake');
     { const c = $('cutin'); c.innerHTML = portrait(G.player.char, ''); c.classList.remove('show'); void c.offsetWidth; c.classList.add('show'); }
-    const b = $('banner'); b.textContent = n > 1 ? `ビンゴ ×${n}！！` : 'ビンゴ！';
+    const b = $('banner'); b.classList.remove('reachb'); b.textContent = n > 1 ? `ビンゴ ×${n}！！` : 'ビンゴ！';
     b.classList.remove('show'); void b.offsetWidth; b.classList.add('show');
     clearTimeout(bingoFX.tm); bingoFX.tm = setTimeout(() => b.classList.remove('show'), 1000);
     const f = $('flash'); f.classList.add('on'); setTimeout(() => f.classList.remove('on'), 120);
@@ -1375,6 +1417,9 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
       b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
     }
     $('turnText').textContent = `${G.turn} / ${G.maxTurns}`;
+    { const rcN = reachCount(G.player.cards);
+      if(fxOn() && !G.over && rcN > (G.lastReach || 0) && !G.cfg.many){ const b = $('banner'); b.textContent = 'リーチ！'; b.classList.add('reachb'); b.classList.remove('show'); void b.offsetWidth; b.classList.add('show'); clearTimeout(bingoFX.tm); bingoFX.tm = setTimeout(() => { b.classList.remove('show'); b.classList.remove('reachb'); }, 700); sfx('tick'); }
+      G.lastReach = rcN; }
     $('game').classList.toggle('reach', fxOn() && !G.over && reachCount(G.player.cards) > 0);
     $('luckyText').textContent = G.lucky ? vLabel(G.lucky) : '-';
     $('deckLeft').textContent = G.deck.length;
@@ -1519,6 +1564,8 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
   });
   $('nextBtn').addEventListener('click', () => { if(!G || G.over || G.paused) return; drawNext(); resSave(); startTimer(); });
   $('btnRev').addEventListener('click', () => { const m = MODES2.find(x => x.id === 'rev'); const pool = ['oko','nico','hyoe','mogu','nemu','tere']; startGame(Object.assign({opp:pool[Math.floor(Math.random() * pool.length)]}, m.cfg())); });
+  $('termBtn').addEventListener('click', () => { if(!G || G.over) return; const was = G.paused; G.paused = true; showGuide(() => { if(G && !was) G.paused = false; }, TERMS); });
+  $('btnTutor').addEventListener('click', () => startGame({mode:'free', opp:'nico', diff:'easy', cards:1, maxTurns:25, speed:'slow', useItems:false, tutorial:true}));
   $('btnMany').addEventListener('click', () => { const m = MODES2.find(x => x.id === 'many'); const pool = ['oko','nico','hyoe','mogu','nemu','tere']; MANY_N = 20; startGame(Object.assign({opp:pool[Math.floor(Math.random() * pool.length)]}, m.cfg())); });
   $('btnResume').addEventListener('click', () => { if(!resumeGame()) toast('つづきのデータが ないよ'); });
   $('quitBtn').addEventListener('click', () => { if(G && !G.over && !confirm('対戦をやめてタイトルに戻る？\n（使ったチケットは戻らないよ）')) return; goTitle(); });
@@ -1792,7 +1839,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     const lines = lineCount(P.cards);
     const pl = lineCount(P.cards), nl = lineCount(N.cards), pr = reachCount(P.cards), nr = reachCount(N.cards);
     let cmp = pl !== nl ? pl - nl : (pr !== nr ? pr - nr : ps - ns);   // ビンゴ数 → リーチ数 → ポイント の順で決める
-    if(G.mode === 'rev') cmp = pl !== nl ? nl - pl : (pr !== nr ? nr - pr : 0);   // 逆ビンゴはポイントは見ない（スキルで有利不利が出ないように）
+    if(G.mode === 'rev') cmp = pl !== nl ? nl - pl : (pr !== nr ? nr - pr : ns - ps);   // 逆ビンゴ：ビンゴが少ない → リーチが少ない → ポイントが少ない 順で勝ち
     let win = cmp > 0;
     if(G.challenge) win = G.challenge.check(G);
     if(G.mode === 'double') win = pl >= 4;
@@ -1804,7 +1851,8 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     if(G.mode === 'tournament' && win) coins += 100;
     if(G.mode === 'survival' && win && SV) coins += 40 * SV.round;
     coins = Math.round(coins * (1 + 0.03 * (lvOf(P.char) - 1)));
-    coins = Math.min(coins, G.mode === 'endless' ? 350 : G.cfg.many ? 400 : G.boss ? 900 : 700);
+    if(G.cfg.many){ const cm = ({8:0.6, 12:0.8, 20:1, 50:1.5, 100:2})[G.cfg.cards] || 1; coins = Math.round(coins * cm); coins = Math.min(coins, Math.round(400 * cm)); }   // どっさりは枚数が多いほどコイン倍率アップ
+    else coins = Math.min(coins, G.mode === 'endless' ? 350 : G.boss ? 900 : 700);
 
     let bonusMsg = '';
     if(win){
@@ -2005,6 +2053,20 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
         <li>規定ターンが終わったときの、ビンゴの数が多いほうが勝ち。同じならリーチの数、それも同じならポイントで決まる。</li>
         <li>オートをONにすると、穴を勝手に開けてくれる。</li>
       </ol>
+      <h2>モードのルール</h2><ul>
+        <li><b>どっさりビンゴ</b>（ボンオリジナル）：カードが8〜100枚！ オート専用で、NPCとビンゴ・リーチの多さで勝負。枚数が多いほど、もらえるコインの倍率がアップ（20枚で×1、50枚で×1.5、100枚で×2）。</li>
+        <li><b>逆ビンゴ</b>（ボンオリジナル）：ビンゴが<b>少ない</b>ほうの勝ち！ 数字は自動で開くよ。「シールド」を押すと、次の数字をさけられる（5回まで）。同じ数のときは、リーチ数→ポイントが少ないほうの勝ち。</li>
+        <li><b>ふたり対戦</b>：1台でふたりで遊ぶ。上のカードが1P、下が2P。それぞれ自分のカードをタップして、早くそろえよう。</li>
+        <li><b>ひとりビンゴ</b>：あいてなし。40ターンでビンゴ2本をめざす。</li>
+        <li><b>ターボビンゴ</b>：0.5びょうで数字が出るスピード勝負。</li>
+        <li><b>絵柄ビンゴ</b>：数字のかわりに、ボンの絵が出るよ。</li>
+      </ul>
+      <h2>おまけ</h2><ul>
+        <li><b>ボンの日記</b>：対戦のあと、ボンが一言日記を書いてくれる。タイトルの「ボンの日記」で読める。</li>
+        <li><b>ごほうびタイム</b>：勝つと、10秒間ボンをなでるミニゲームができる。コインとなかよし度がもらえる。</li>
+        <li><b>シェア画像</b>：結果画面のボタンで、対戦結果の画像が作れる。</li>
+        <li><b>おしゃべり</b>：対戦中、ときどきボンたちが話しかけてくる。</li>
+      </ul>
       <h2>用語</h2><ul>
         <li><b>ビンゴ（ライン）</b>：5マス1列がそろうこと。1本ごとに点が入る。</li>
         <li><b>ターン</b>：数字が1つ出る1回分。</li>
@@ -2014,7 +2076,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
         <li><b>カード柄</b>：ガチャで集めて、コレクションで選べる。</li>
         <li><b>オート／マニュアル</b>：穴を自動で開ける／自分でタップして開ける。</li>
         <li><b>コイン</b>：ガチャに使う。</li>
-        <li><b>チケット</b>：対戦に入るときに使う。5分に1枚たまる（最大10枚）。</li>
+        <li><b>チケット</b>：対戦に入るときに使う。3分に1枚たまる（最大20枚）。ふたり対戦とひとりビンゴは、チケットなしで遊べるよ。</li>
         <li><b>ダウバー</b>：穴を塗る色。ボンの色で選べる。</li>
         <li><b>フレーム</b>：立ち絵の枠のデザイン。</li>
         <li><b>デイリーミッション</b>：毎日変わるお題。達成でコイン。</li>
