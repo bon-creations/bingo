@@ -96,6 +96,38 @@ h1.logo svg{width:100%;height:auto;display:block;overflow:visible}
 .cell.open{background:var(--yellow)}
 .cell.open::after{content:"";position:absolute;inset:14%;border-radius:50%;background:rgba(255,122,162,.5)}
 .cell.gold{box-shadow:inset 0 0 0 2px #e0a000;background:#fff3c2}
+.hdr div{border-radius:8px 8px 3px 3px;color:#fff;font-size:1.05rem;line-height:1.5;text-shadow:0 1px 0 rgba(0,0,0,.25)}
+.hdr div:nth-child(1){background:#e0453a}.hdr div:nth-child(2){background:#f0b92a}.hdr div:nth-child(3){background:#2f9e5c}.hdr div:nth-child(4){background:#3f9be0}.hdr div:nth-child(5){background:#8b5cc4}
+.cell{background:#fffaf0;font-weight:900;font-size:clamp(1rem,5vw,1.5rem);box-shadow:inset 0 0 0 2px #eadfc9}
+.cell.open{background:#fffaf0}
+.cell.open:not(.pcell):not(.free){color:transparent}
+.cell.open::after{inset:9%;box-shadow:inset 0 0 0 4px rgba(255,255,255,.28),0 2px 0 rgba(0,0,0,.28);background:rgba(255,122,162,.9)}
+.cell.open:not(.pcell):not(.free)::before{content:"";position:absolute;z-index:2;left:calc(50% - 7px);top:calc(50% - 7px);width:4px;height:4px;border-radius:50%;background:rgba(0,0,0,.28);box-shadow:8px 0 0 rgba(0,0,0,.28),0 8px 0 rgba(0,0,0,.28),8px 8px 0 rgba(0,0,0,.28)}
+.cell.open.dau-red::after,.cell.open.dau-yellow::after,.cell.open.dau-blue::after,.cell.open.dau-green::after,.cell.open.dau-purple::after,.cell.open.dau-pink::after{box-shadow:inset 0 0 0 4px rgba(255,255,255,.28),0 2px 0 rgba(0,0,0,.28)}
+/* どっさりビンゴ: 縦持ちでも 2x2 で大きく */
+#game.paged #cardNav{display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:4px;font-weight:bold;font-size:.85rem}
+#game.paged .cardrow{display:flex;align-items:center;gap:4px}
+#game.paged #cardStack{flex:1;min-width:0}
+#game.paged .navbtn{display:block;flex:0 0 auto;width:26px;height:96px;border:0;border-radius:12px;background:var(--pink);color:#fff;font-size:1.1rem;font-weight:bold;box-shadow:0 3px 0 var(--pink-d)}
+#game.paged .navbtn:disabled{opacity:.3}
+#game.paged:not(.land) .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#game.paged:not(.land) .cards.many .cell{font-size:clamp(.8rem,3.9vw,1.1rem);border-radius:6px}
+#game.paged:not(.land) .cards.many .cell.free{font-size:.55rem}
+#game.paged.manyv #viewWho{display:none}
+/* どっさりビンゴ: 上部を ボール＋履歴 の1行に */
+#game.compact .stage{grid-template-columns:auto}
+#game.compact .stage .side{display:none}
+#game.compact #gLeft .panel{display:flex;align-items:center;gap:10px;padding:8px 10px}
+#game.compact .ball{width:84px;height:84px;border-width:3px}
+#game.compact .history{flex:1;margin:0;max-height:76px;overflow:hidden;justify-content:flex-start}
+#game.compact .log{max-height:64px;overflow:auto;font-size:.8rem}
+.dau-red{--dc:#d63a2f}.dau-yellow{--dc:#e0b019}.dau-blue{--dc:#3f7be0}.dau-green{--dc:#3fa764}.dau-purple{--dc:#8b5cc4}.dau-pink{--dc:#ee7fa8}.dau-rainbow{--dc:#b79be0}
+.cell.open[class*="dau-"]:not(.pcell):not(.free)::after{background-color:#fff;background-image:var(--face);background-repeat:no-repeat;background-size:210%;background-position:50% 22%;border:3px solid var(--dc);inset:5%;box-shadow:0 2px 0 rgba(0,0,0,.28)}
+.cell.open[class*="dau-"]:not(.pcell):not(.free)::before{display:none}
+.bingo-card.cs-plain{background:linear-gradient(135deg,#e0453a,#f0b92a,#2f9e5c,#3f9be0,#8b5cc4,#ee7fa8)}
+#game{background-image:radial-gradient(circle,rgba(224,69,58,.13) 7px,transparent 8px),radial-gradient(circle,rgba(63,155,224,.13) 7px,transparent 8px),radial-gradient(circle,rgba(240,185,42,.16) 7px,transparent 8px);background-size:72px 72px;background-position:0 0,36px 36px,0 36px}
+.ball{position:relative;overflow:hidden}
+.ball::before{content:"BON";position:absolute;left:0;right:0;top:12%;height:20%;background:#3f7be0;color:#fff;font-size:.62rem;font-weight:900;letter-spacing:2px;text-align:center;line-height:1.9;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
 .peek{background:#fff;border:3px solid #3f7be0;color:#2a5fc0;border-radius:20px;padding:3px 12px;font-weight:900;font-size:.82rem;margin:0 auto 4px;text-align:center}
 .cell.hint{animation:hintpulse 1s infinite;box-shadow:0 0 0 3px #3f7be0}
 @keyframes hintpulse{50%{box-shadow:0 0 0 6px #9fc5ff}}
@@ -1326,7 +1358,10 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     });
   }
 
+  const FACE_OF = {red:'oko', yellow:'nico', blue:'hyoe', green:'mogu', purple:'nemu', pink:'tere', rainbow:'niji'};
+  function applyFace(){ const id = FACE_OF[save.daub.sel] || 'oko'; if(PIC[id]) document.documentElement.style.setProperty('--face', `url("${PIC[id]}")`); }
   function renderAll(){
+    applyFace();
     { const pk = $('peekEl'); if(pk){ const on = !!(G && G.peek && !G.over && G.player.char === 'hyoe'); pk.classList.toggle('hidden', !on); if(on) pk.textContent = G.cfg.pic ? `ひょえ…！ 次は ${LET[Math.floor((G.peek - 1) / 15)]}の${CHAR[PICORDER[(G.peek - 1) % 15]].name} かも…` : `ひょえ…！ 次は ${LET[Math.floor((G.peek - 1) / 15)]}の${G.peek} かも…`; } }
     $('autoBtn').setAttribute('aria-pressed', String(G && G.cfg && G.cfg.duo ? false : (!!save.sett.auto || !!(G && G.cfg && (G.cfg.many || G.cfg.rev)))));
     if(G && G.cfg){ $('shieldBtn').classList.toggle('hidden', !G.cfg.rev); if(G.cfg.rev) $('shieldBtn').textContent = G.shield ? 'シールド構え中！' : `シールド×${G.shields}`; }
@@ -1397,7 +1432,8 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
     if(!G) return;
     const flash = G.lastFlash || new Set();
     if(!G.view) G.view = {who:'p', page:0};
-    if(!$('game').classList.contains('land')){
+    { const mv = !!G.cfg.many; $('game').classList.toggle('paged', $('game').classList.contains('land') || mv); $('game').classList.toggle('manyv', mv); $('game').classList.toggle('compact', mv); if(mv) G.view.who = 'p'; }
+    if(!$('game').classList.contains('paged')){
       $('pTitle').classList.remove('hidden'); $('npcTitle').classList.remove('hidden');
       const many = !!G.cfg.many, hideN = many || !!G.cfg.solo;
       $('playerCards').classList.toggle('many', many); $('npcCards').classList.toggle('many', many);
