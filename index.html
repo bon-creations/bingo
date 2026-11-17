@@ -973,6 +973,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
       <div class="row"><span>読み上げの言語</span><div class="opts"><button class="opt" data-vl="ja" aria-pressed="${save.sett.vlang !== 'en'}">日本語</button><button class="opt" data-vl="en" aria-pressed="${save.sett.vlang === 'en'}">English</button></div></div>
       <h2>あそびかた</h2>${t('big','文字を大きくする')}<div class="row"><span>はじめてガイド</span><button class="btn small sub" data-act="guide">もういちど見る</button></div>${t('auto','オート（出た数字を自動で開く）')}${grp('抽選ペース（ふだん）','dspeed',[['slow','ゆっくり'],['normal','ふつう'],['fast','はやい']], save.sett.dspeed || 'normal')}
       <h2>表示</h2>${t('fx','ビンゴの派手な演出（紙吹雪・フラッシュ）')}${grp('アニメの速さ','anim',[['normal','ふつう'],['fast','はやい'],['off','なし']], save.sett.anim || 'normal')}
+      <h2>カードに押される絵</h2><div class="row" style="flex-direction:column;align-items:stretch"><span>開けたマスのボンの顔をえらぶ<br><small>「ダウバーに合わせる」だと、ダウバーの色のボンになるよ</small></span><div class="icopick"><button class="icob" data-face="" aria-pressed="${!save.sett.faceChar}"><small>ダウバーに<br>合わせる</small></button>${PICORDER.map(id => `<button class="icob" data-face="${id}" aria-pressed="${save.sett.faceChar === id}"><img src="${PIC[id]}" alt="${CHAR[id].name}"><small>${CHAR[id].name.replace('ボン','')}</small></button>`).join('')}</div></div>
       <h2>アプリのアイコン</h2><div class="row" style="flex-direction:column;align-items:stretch"><span>ボールの中のボンをえらぶ<br><small>ホーム画面に追加する「前」に えらんでね（追加したあとは変えられないよ）</small></span><div class="icopick">${PICORDER.map(id => `<button class="icob" data-icon="${id}" aria-pressed="${(save.sett.iconChar || 'oko') === id}"><img src="${PIC[id]}" alt="${CHAR[id].name}"><small>${CHAR[id].name.replace('ボン','')}</small></button>`).join('')}</div></div>
       <h2>セーブデータ</h2><div class="row"><span>データの書き出し<br><small>ファイルに保存（バックアップ）</small></span><button class="btn small" data-act="export">書き出す</button></div>
       <div class="row"><span>データの読み込み<br><small>書き出したファイルから復元</small></span><button class="btn small sub" data-act="import">読み込む</button></div>
@@ -994,6 +995,8 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
       rd.readAsText(f);
     };
     $('listBody').onclick = e => {
+      const fc = e.target.closest('[data-face]');
+      if(fc){ save.sett.faceChar = fc.dataset.face; writeSave(); applyFace(); openSett(); toast('カードの絵を かえたよ'); return; }
       const ic = e.target.closest('[data-icon]');
       if(ic){ save.sett.iconChar = ic.dataset.icon; save.sett.iconPicked = true; writeSave(); applyIcon(); openSett(); toast('アイコンを かえたよ'); return; }
       const vl = e.target.closest('[data-vl]');
@@ -1401,7 +1404,7 @@ body.anim-fast *,body.anim-fast *::before,body.anim-fast *::after{animation-dura
   }
 
   const FACE_OF = {red:'oko', yellow:'nico', blue:'hyoe', green:'mogu', purple:'nemu', pink:'tere', rainbow:'niji'};
-  function applyFace(){ const id = FACE_OF[save.daub.sel] || 'oko'; if(PIC[id]) document.documentElement.style.setProperty('--face', `url("${PIC[id]}")`); }
+  function applyFace(){ const id = save.sett.faceChar || FACE_OF[save.daub.sel] || 'oko'; if(PIC[id]) document.documentElement.style.setProperty('--face', `url("${PIC[id]}")`); }
   function renderAll(){
     applyFace();
     { const pk = $('peekEl'); if(pk){ const on = !!(G && G.peek && !G.over && G.player.char === 'hyoe'); pk.classList.toggle('hidden', !on); if(on) pk.textContent = G.cfg.pic ? `ひょえ…！ 次は ${LET[Math.floor((G.peek - 1) / 15)]}の${CHAR[PICORDER[(G.peek - 1) % 15]].name} かも…` : `ひょえ…！ 次は ${LET[Math.floor((G.peek - 1) / 15)]}の${G.peek} かも…`; } }
